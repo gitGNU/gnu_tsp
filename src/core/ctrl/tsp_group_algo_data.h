@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/core/ctrl/tsp_group_algo_data.h,v 1.1 2002/08/27 08:56:09 galles Exp $
+$Header: /sources/tsp/tsp/src/core/ctrl/tsp_group_algo_data.h,v 1.1.1.1 2002/08/27 08:56:09 galles Exp $
 
 -----------------------------------------------------------------------
 

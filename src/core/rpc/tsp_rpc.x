@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/core/rpc/tsp_rpc.x,v 1.3 2002/09/05 13:30:07 tntdev Exp $
+$Header: /sources/tsp/tsp/src/core/rpc/tsp_rpc.x,v 1.4 2002/09/05 14:22:22 galles Exp $
 
 -----------------------------------------------------------------------
 
@@ -174,7 +174,4 @@ program TSP_RPC {
 %}
 #endif
 
-%#define TSP_STRACE_RPC_ERROR(cl, pResult) if(!pResult) \
- { \
-      STRACE_ERROR(("%s", clnt_sperror(cl, ""))); \
- }
+%#define TSP_STRACE_RPC_ERROR(cl, pResult) if(!pResult)  {  STRACE_ERROR(("%s", clnt_sperror(cl, "")));  }

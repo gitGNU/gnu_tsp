@@ -1,6 +1,6 @@
 /*!  \file
 
-$Header: /sources/tsp/tsp/src/util/libres/datar.c,v 1.1 2003/01/31 18:32:56 tsp_admin Exp $
+$Header: /sources/tsp/tsp/src/util/libres/datar.c,v 1.2 2003/02/27 15:39:31 tsp_admin Exp $
 
 -----------------------------------------------------------------------
 
@@ -263,6 +263,12 @@ int	d_read_r (d_rhandle h, void *buf)
   return (obj->recl);
 }
 
+int	d_restart_r (d_rhandle h)
+{
+  data_read* obj = (data_read*)h;
+  lseek (obj->datafd,obj->pdat,0);
+}
+    
 /*-----------------------------------------------------*\
 |							|
 |			d_dread				|

@@ -1,6 +1,6 @@
 /*!  \file 
  
-$Header: /sources/tsp/tsp/src/core/include/tsp_const_def.h,v 1.22 2004/09/19 22:59:11 erk Exp $
+$Header: /sources/tsp/tsp/src/core/include/tsp_const_def.h,v 1.23 2004/09/20 20:55:59 erk Exp $
 
 -----------------------------------------------------------------------
 

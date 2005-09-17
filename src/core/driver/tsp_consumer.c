@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/core/driver/tsp_consumer.c,v 1.32 2005/08/14 23:06:39 erk Exp $
+$Header: /sources/tsp/tsp/src/core/driver/tsp_consumer.c,v 1.32.2.1 2005/09/17 17:35:05 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -34,7 +34,6 @@ Purpose   : Main implementation for the TSP consumer library
 
 -----------------------------------------------------------------------
 */
-
 #include "tsp_sys_headers.h"
 
 #include "tsp_consumer.h"
@@ -43,6 +42,7 @@ Purpose   : Main implementation for the TSP consumer library
 #include "tsp_data_receiver.h"
 #include "tsp_sample_ringbuf.h"
 #include "tsp_datastruct.h"
+#include "tsp_time.h"
 
 
 /* Pool time for network data read (µs) */
@@ -253,7 +253,7 @@ static void TSP_delete_object_tsp(TSP_otsp_t* o)
 
 }
 
-static  void TSP_print_object_tsp(TSP_otsp_t* o)
+void TSP_print_object_tsp(TSP_otsp_t* o)
 {
 	
   STRACE_IO(("-->IN"));
@@ -278,6 +278,7 @@ int TSP_consumer_init(int* argc, char** argv[])
   STRACE_IO(("-->IN"));
 
   X_argv = (char**)calloc(*argc, sizeof(char*));
+  X_argc = *argc;
   X_tsp_argv.TSP_argv_t_val = (char**)calloc(*argc, sizeof(char*));
   X_tsp_argv.TSP_argv_t_len = 0;
   TSP_CHECK_ALLOC(X_argv, FALSE);
@@ -936,6 +937,15 @@ int TSP_consumer_request_sample(TSP_provider_t provider, TSP_consumer_symbol_req
 	
   /* Get the computed ans_sample from the provider */
   ans_sample = TSP_request_sample(&req_sample, otsp->server);
+  
+  /* 
+   * now update provider global index in the requested symbols
+   * in case unknown symbols was found on provider side
+   */
+  for(i = 0 ; i <  symbols->len ; i++)
+    {
+      symbols->val[i].index = ans_sample->symbols.TSP_sample_symbol_info_list_t_val[i].provider_global_index;
+    }
 
   /*free allocated request sample symbol list */
   free(req_sample.symbols.TSP_sample_symbol_info_list_t_val);  
@@ -1023,7 +1033,7 @@ static void* TSP_request_provider_thread_receiver(void* arg)
   int is_fifo_full;  
                     
   STRACE_IO(("-->IN"));
-  STRACE_INFO(("Receiver thread started. Id=%u", pthread_self())); 
+  STRACE_INFO(("Receiver thread started. Id=%u", (uint32_t)pthread_self())); 
 
   while(TRUE)
     {

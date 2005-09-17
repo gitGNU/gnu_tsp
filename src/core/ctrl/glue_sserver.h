@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Id: glue_sserver.h,v 1.19 2004/11/09 22:33:01 erk Exp $
+$Id: glue_sserver.h,v 1.19.4.1 2005/09/17 17:35:04 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -185,6 +185,13 @@ int GLU_start(void);
 GLU_server_type_t GLU_get_server_type(void);
 
 
+/** GLU_get_provider_global_indexes provider global indexes corresponding
+ * to given symbol list. Used to validate client provided symbol list
+ * @param symbol_list IN the symbol list to validate
+ * @param pg_indexes OUT array containing corresponding provider global indexes or -1 if not found 
+ * @return TRUE if all symbol found, else return FALSE 
+ */
+int GLU_get_provider_global_indexes(TSP_sample_symbol_info_list_t* symbol_list, int* pg_indexes);
 
 /**
  * GLU instance creation.

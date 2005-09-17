@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Id: tsp_provider.h,v 1.12 2004/10/26 23:05:13 erk Exp $
+$Id: tsp_provider.h,v 1.12.4.1 2005/09/17 17:35:04 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -39,7 +39,6 @@ Purpose   : Main interface for the producer module
 #define _TSP_PROVIDER_H
 
 #include "tsp_prjcfg.h"
-
 #include "tsp_datastruct.h"
 
 /**
@@ -50,6 +49,12 @@ Purpose   : Main interface for the producer module
  * @{
  */
 
+/**
+ * Initialize TSP provider library.
+ * One should call this before any other TSP provider lib call.
+ * @param argc INOUT, the number of argument of the main
+ * @param argv INOUT, array of argument of size argc.
+ */
 int TSP_provider_private_init(int* argc, char** argv[]);
 
 
@@ -61,14 +66,14 @@ void TSP_provider_request_close(const TSP_request_close_t* req_close);
 void  TSP_provider_request_information(TSP_request_information_t* req_info, 
  			      TSP_answer_sample_t* ans_sample);
 
-void  TSP_provider_request_sample(TSP_request_sample_t* req_info, 
+void  TSP_provider_request_sample(TSP_request_sample_t* req_sample, 
 			 TSP_answer_sample_t* ans_sample);
 void TSP_provider_request_sample_free_call(TSP_answer_sample_t* ans_sample);
 
-void  TSP_provider_request_sample_init(TSP_request_sample_init_t* req_info, 
+void  TSP_provider_request_sample_init(TSP_request_sample_init_t* req_sample_init, 
  			      TSP_answer_sample_init_t* ans_sample);
 
-void  TSP_provider_request_sample_destroy(TSP_request_sample_destroy_t* req_info, 
+void  TSP_provider_request_sample_destroy(TSP_request_sample_destroy_t* req_sample_destroy, 
 					  TSP_answer_sample_destroy_t* ans_sample);
 
 int TSP_provider_is_initialized(void);

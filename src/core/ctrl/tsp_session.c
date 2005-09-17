@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/core/ctrl/tsp_session.c,v 1.18 2004/09/22 14:25:58 tractobob Exp $
+$Header: /sources/tsp/tsp/src/core/ctrl/tsp_session.c,v 1.18.4.1 2005/09/17 17:35:05 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -593,47 +593,37 @@ int TSP_session_is_consumer_connected_by_channel(channel_id_t channel_id)
 int TSP_session_get_symbols_global_index_by_channel(channel_id_t channel_id,
 						   TSP_sample_symbol_info_list_t* symbol_list)
 {
-  TSP_session_t* session;
-  TSP_sample_symbol_info_list_t origin_sym_list;
-  int i,j;
-  int ret = TRUE;
+    TSP_session_t* session;
+    int i;
+    int ret=TRUE;
+    TSP_LOCK_MUTEX(&X_session_list_mutex,FALSE);
+    TSP_GET_SESSION(session, channel_id, FALSE);
     
-  TSP_LOCK_MUTEX(&X_session_list_mutex,FALSE);
-  TSP_GET_SESSION(session, channel_id, FALSE);
-
-  /* Get the original GLU symbol list */
-   if(!GLU_get_sample_symbol_info_list(session->session_data->glu_h, &origin_sym_list))
-    {
-      STRACE_ERROR(("Function GLU_get_sample_symbol_info_list failed"));
+    int* pg_indexes = calloc( symbol_list->TSP_sample_symbol_info_list_t_len, sizeof(int) );
+    
+    if (pg_indexes == NULL) {
+      STRACE_ERROR(("Unable to allocate memory for global provider index"));
       return FALSE;
     }
-
-   /* For each requested symbols, check by name, and find the provider global index */
-
-   for( i = 0 ; i < symbol_list->TSP_sample_symbol_info_list_t_len ; i++)
-     {
-       int found = FALSE;
-       TSP_sample_symbol_info_t* looked_for = &(symbol_list->TSP_sample_symbol_info_list_t_val[i]);
-       
-       for( j = 0 ; j < origin_sym_list.TSP_sample_symbol_info_list_t_len ; j++)
-	 {
-	   TSP_sample_symbol_info_t* compared = &(origin_sym_list.TSP_sample_symbol_info_list_t_val[j]);
-	   if(!strcmp(looked_for->name, compared->name))
-	     {
-	       found = TRUE;
-	       looked_for->provider_global_index = compared->provider_global_index;
-	     }
-	   if(found) break;
-	 }
-       if(!found)
-	 {
-	   ret = FALSE;
-	   STRACE_INFO(("Unable to find symbol '%s'",  looked_for->name));
-	   break;	   
-	 }
-     }
-   
-  TSP_UNLOCK_MUTEX(&X_session_list_mutex,FALSE);
+  
+    /* Get global provider indexes */
+    if (GLU_get_provider_global_indexes(symbol_list,pg_indexes) == FALSE) {
+      STRACE_ERROR(("Some symbols have not been found"));
+      ret=FALSE;
+    }
+    
+    /* Store all global indexes into list */
+    for ( i=0 ; i < symbol_list->TSP_sample_symbol_info_list_t_len ; i++ ) {
+      symbol_list->TSP_sample_symbol_info_list_t_val[i].provider_global_index=pg_indexes[i];
+      
+      /* If symbol has not been found */
+      if ( pg_indexes[i] == -1 ) {
+        STRACE_INFO(("Unable to find symbol '%s'",  symbol_list->TSP_sample_symbol_info_list_t_val[i].name));
+        ret=FALSE;
+      }
+    }
+     
+    TSP_UNLOCK_MUTEX(&X_session_list_mutex,FALSE);
 
   return ret;
 

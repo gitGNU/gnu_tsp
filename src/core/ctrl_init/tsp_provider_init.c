@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/core/ctrl_init/tsp_provider_init.c,v 1.11 2005/08/17 12:53:32 deweerdt Exp $
+$Header: /sources/tsp/tsp/src/core/ctrl_init/tsp_provider_init.c,v 1.11.2.1 2005/09/17 17:35:05 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -39,7 +39,7 @@ Purpose   : Function calls to launch a TSP Provider program
 #include "tsp_sys_headers.h"
 
 #include "tsp_provider.h"
-#include "tsp_request.h"
+#include "tsp_request_handler.h"
 #include "tsp_provider_init.h"
 
 #ifdef BUILD_XMLRPC

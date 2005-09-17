@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/core/driver/tsp_group.h,v 1.3.4.1 2005/09/17 17:35:05 erk Exp $
+$Id: tsp_common.h,v 1.1.2.1 2005/09/17 17:35:04 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -24,35 +24,27 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 -----------------------------------------------------------------------
 
-Project   : TSP
-Maintainer : tsp@astrium-space.com
-Component : Consumer
+Project    : TSP
+Maintainer : tsp@astrium.eads.net
+Component  : Common
 
 -----------------------------------------------------------------------
 
-Purpose   : Interface for the groups management
+Purpose   : Main interface for the producer module
 
 -----------------------------------------------------------------------
  */
 
-#ifndef _TSP_GROUP_H
-#define _TSP_GROUP_H
+#ifndef _TSP_COMMON_H
+#define _TSP_COMMON_H
 
 #include "tsp_prjcfg.h"
-
 #include "tsp_datastruct.h"
 
-/** The group object handle */
-typedef  void* TSP_groups_t;
-
-/**
- * Creation of the group object.
- * @param The symbol list that will be used to create the groups.
- * @param group_number The total number of groups
- * @return The group object handle
- */
-TSP_groups_t TSP_group_create_group_table (const TSP_sample_symbol_info_list_t* symbols,
-					   int group_number);
-
-void TSP_group_delete_group_table(TSP_groups_t groups);                                    
-#endif /* _TSP_GROUP_H */
+void
+TSP_common_sample_symbol_info_list_copy(TSP_sample_symbol_info_list_t* dest_symbols, 
+					TSP_sample_symbol_info_list_t  src_symbols);
+void
+TSP_common_sample_symbol_copy(TSP_sample_symbol_info_t* dest_symbol, 
+			      TSP_sample_symbol_info_t src_symbol);
+#endif /* _TSP_COMMON_H */

@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/consumers/ascii_writer/tsp_ascii_writer_main.c,v 1.5 2005/02/18 23:42:59 erk Exp $
+$Header: /sources/tsp/tsp/src/consumers/ascii_writer/tsp_ascii_writer_main.c,v 1.5.4.1 2005/09/17 17:30:45 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -42,6 +42,7 @@ Purpose   : TSP ascii writer consumer (main)
 
 #include "tsp_ascii_writer.h"
 #include "tsp_consumer.h"
+
 
 static void 
 my_sighandler(int signum) {
@@ -118,7 +119,7 @@ main (int argc, char* argv[]) {
     printf("   -x   the file specifying the list of symbols to be sampled\n");
     printf("   -o   the name of the output file\n");
     printf("   -l   (optional) the maximum number of sample to be stored in file\n");
-    printf("   -u   (optional) the  TSP provider URL <PROTOCOL://HOST/SERVER:PORT> \n");  
+    printf("   -u   (optional) the  TSP provider URL <PROTOCOL://HOST/SERVER:PORT> \n");
     exit(retcode);
   }
 
@@ -143,7 +144,7 @@ main (int argc, char* argv[]) {
     fprintf(stdout,"%s: Validate symbols against provider info...\n",argv[0]);
     fflush(stdout);
     retcode = tsp_ascii_writer_validate_symbols(mysymbols,nb_symbols,
-						provider_url,&symbol_list);
+						                                    provider_url,&symbol_list);
   }
 
   if (0==retcode) {

@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Id: glue_sserver.h,v 1.19.4.3 2005/09/18 22:20:29 erk Exp $
+$Id: glue_sserver.h,v 1.19.4.4 2005/09/18 23:25:37 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -212,13 +212,13 @@ typedef struct GLU_handle_t*      (* GLU_get_instance_ft      )(struct GLU_handl
  */
 typedef int                (* GLU_init_ft              )(struct GLU_handle_t* this,int fallback_argc, char* fallback_argv[]);
 /**
- * Start the loop that will push data to datapool with pus_next_item
+ * Start the loop that will push data to datapool with push_next_item
  * 
  * @return status 
  */
 typedef void*              (* GLU_run_ft               )(void* this);
 /**
- * Start the loop that will push data to datapool with pus_next_item
+ * Start the loop that will push data to datapool with push_next_item
  * 
  * @return status 
  */

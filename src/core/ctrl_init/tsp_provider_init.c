@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/core/ctrl_init/tsp_provider_init.c,v 1.11.2.1 2005/09/17 17:35:05 erk Exp $
+$Header: /sources/tsp/tsp/src/core/ctrl_init/tsp_provider_init.c,v 1.11.2.2 2005/09/18 16:51:12 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -48,13 +48,13 @@ Purpose   : Function calls to launch a TSP Provider program
 #include "tsp_server.h"
 #endif
 
-int TSP_provider_init(int* argc, char** argv[])
+int TSP_provider_init(GLU_handle_t* theGLU, int* argc, char** argv[])
 {
 
   int ret;
   STRACE_IO(("-->IN"));
 
-  ret = TSP_provider_private_init(argc, argv);
+  ret = TSP_provider_private_init(theGLU,argc, argv);
   
   /* Initialize tsp request handlers structures */
   ret = TSP_provider_rqh_manager_init();

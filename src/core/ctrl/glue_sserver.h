@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Id: glue_sserver.h,v 1.19.4.1 2005/09/17 17:35:04 erk Exp $
+$Id: glue_sserver.h,v 1.19.4.2 2005/09/18 16:51:12 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 -----------------------------------------------------------------------
 
 Project   : TSP
-Maintainer: tsp@astrium-space.com
+Maintainer: tsp@astrium.eads.net
 Component : Provider
 
 -----------------------------------------------------------------------
@@ -49,26 +49,35 @@ Purpose   : Interface for the glue server : the data producer
  * coded each time the underlying 'real' sampled system 
  * (hardware card, simulator, ...) change.
  * The GLU interface should be implemented in order to combine
- * the TSP provider lib int a real TSP provider.
+ * the TSP provider lib in a real TSP provider.
  * @{
  */
 
+
 /** GLU server type */
-enum GLU_server_type_t
+typedef enum GLU_server_type_t
 {
-  /** GLU is active. Means that the data are continuously produced
-      and must be read at the same pace (or faster) by the provider */
+  /** 
+   * GLU is active. Means that the data are continuously produced
+   * and must be read at the same pace (or faster) by the provider.
+   * When GLU is active their shouldn'tr be more that one 
+   * GLU instance running by provider.
+   * @see GLU_get_instance.
+   */
   GLU_SERVER_TYPE_ACTIVE,
 
-  /** GLU is passive. Means that the data are produced only when the
-      provider ask for them (typically File Based Glu/Provider)*/
+  /** 
+   * GLU is passive. Means that the data are produced only when the
+   * provider ask for them (typically File Based Glu/Provider)
+   */
   GLU_SERVER_TYPE_PASSIVE
-};
-typedef enum GLU_server_type_t GLU_server_type_t;
+} GLU_server_type_t;
 
 
-
-enum GLU_get_state_t
+/**
+ * The state of the GLU.
+ */
+typedef enum GLU_get_state_t
 {
   /** new item available */
   GLU_GET_NEW_ITEM,
@@ -89,110 +98,40 @@ enum GLU_get_state_t
       by the provider */
   GLU_GET_DATA_LOST
 
-};
-typedef enum GLU_get_state_t GLU_get_state_t;
+} GLU_get_state_t;
 
-/** Item used to transmit a data sample */
-struct glu_item_t
+/** 
+ * Item used to transmit a data sample 
+ */
+typedef struct glu_item_t
 {
     time_stamp_t time;
-    int provider_global_index;
-    double value;
+    int          provider_global_index;
+    double       value;
 
-};
+} glu_item_t;
 
-typedef struct glu_item_t glu_item_t;
-
-/** Handle for a GLU instance */
-typedef void* GLU_handle_t;
-
-
-/** GLU global handle dummy value.
-    For an active GLU, the function GLU_get_instance
-    always returns GLU_GLOBAL_HANDLE, as for the active
-    case there is always one single GLU in the system */ 
-#define GLU_GLOBAL_HANDLE ((GLU_handle_t)0x1)
-
-
-
-/** GLU server name.
-    This string will be used by the consumers to get informations
-    about a provider. It must be meaningfull (ex : "Temperatures Sampler" ) */
-char* GLU_get_server_name(void);
-
-
-/**
-* GLU initialization function.
-*
-* The code in this function will be called once,
-* and may do any usefull global check and initialization. 
-* Usually the data stream should not be started in this function
-* as there is no connected consumer when this function is
-* called. To start your data stream, wait for the first GLU_get_instance
-* function that will be called for each consumer connection
-*
-* The parameters for this function come from the parameters
-* that may have been provided thrue the command line that was used
-* to launch the provider. In this function the GLU should not use these
-* parameters, but it should check their value, as these value
-* will be used as fallback parameters for the GLU_get_instance function
-* each time a consumer connect to the provider and does not provide
-* its own parameters
-*
-* the GLU may then for this function return :
-* - FALSE if it does not want to be started ( ex : when the
-* parameters are incorrect, or when there is no parameters
-* at all and this GLU exepects parameters). The provider
-* will stop.
-* - TRUE if everything is OK
-*
-* NOTE1 : Sometimes, the the only way to check the provided
-* parameters is to start the data stream. If so,
-* the data stream must not be started a second time 
-* in the get_instance function.
-*
-* NOTE2 : This string is provided in this function for fallback
-* test only and should not be memorized by the GLU server
-*
-* NOTE3 : When there is not fallback stream at all, the value
-* of fallback_argv  is 0. It is up to the GLU server
-* to decide if it is acceptable for the provider to be 
-* started with no fallback stream at all (it usually is
-* acceptable)
-*
-* @param fallback_argc Number of fallback initialisation elements as used in main(argc, argv)
-* @param fallback_argv Fallback initialisation elements as used in main(argc, argv)
-* The first usefull parameter is always
-* fallback_argv[1], so as the getopt* functions may be used to
-* parse those parameters
-* @return Return FALSE if a fatal error occur during initialisation
-* or if there is a probleme with the provided parameters
-*/
-int GLU_init(int fallback_argc, char* fallback_argv[]);
-
-/**
-* Start the loop that will had data to datapool whith pus_next_item
-* @return status 
-*/
-
-int GLU_start(void);
-
-
-/**
-* GLU server type : ACTIVE or PASSIVE.
-* @return GLU server type.
-*/
-GLU_server_type_t GLU_get_server_type(void);
-
-
-/** GLU_get_provider_global_indexes provider global indexes corresponding
- * to given symbol list. Used to validate client provided symbol list
- * @param symbol_list IN the symbol list to validate
- * @param pg_indexes OUT array containing corresponding provider global indexes or -1 if not found 
- * @return TRUE if all symbol found, else return FALSE 
+/*
+ * Define the GLU handle data type
  */
-int GLU_get_provider_global_indexes(TSP_sample_symbol_info_list_t* symbol_list, int* pg_indexes);
-
+struct GLU_handle_t; /* necessary forward declaration */
+/** 
+ * GLU server name getter.
+ * This string will be used by the consumers to get informations
+ * about a provider. It must be meaningfull (ex : "Temperatures Sampler" ) 
+ */
+typedef char*              (* GLU_get_server_name_ft   )(struct GLU_handle_t* this);
+/**
+ * GLU server type getter.
+ * Will get the GLU type i.e. ACTIVE or PASSIVE.
+ * @return GLU server type.
+ */
+typedef GLU_server_type_t  (* GLU_get_server_type_ft   )(struct GLU_handle_t* this);
+/**
+ * Default GLU base frequency.
+ * @return GLU base frequency (Hz)
+ */
+typedef double             (* GLU_get_base_frequency_ft)(struct GLU_handle_t* this);
 /**
  * GLU instance creation.
  * This function will be called by the provider for each consumer
@@ -222,26 +161,168 @@ int GLU_get_provider_global_indexes(TSP_sample_symbol_info_list_t* symbol_list, 
  * to get detailed information about the error. 
  * @return The created GLU handle. Returns 0 when the function fail
  */
-GLU_handle_t GLU_get_instance(int custom_argc,
-			      char* custom_argv[],
-			      char** error_info);
+typedef struct GLU_handle_t*      (* GLU_get_instance_ft      )(struct GLU_handle_t* this, int custom_argc, char* custom_argv[], char** error_info);
+/**
+ * GLU initialization function.
+ *
+ * The code in this function will be called once,
+ * and may do any usefull global check and initialization. 
+ * Usually the data stream should not be started in this function
+ * as there is no connected consumer when this function is
+ * called. To start your data stream, wait for the first GLU_get_instance
+ * function that will be called for each consumer connection
+ *
+ * The parameters for this function come from the parameters
+ * that may have been provided thrue the command line that was used
+ * to launch the provider. In this function the GLU should not use these
+ * parameters, but it should check their value, as these value
+ * will be used as fallback parameters for the GLU_get_instance function
+ * each time a consumer connect to the provider and does not provide
+ * its own parameters
+ *
+ * the GLU may then for this function return :
+ * - FALSE if it does not want to be started ( ex : when the
+ * parameters are incorrect, or when there is no parameters
+ * at all and this GLU exepects parameters). The provider
+ * will stop.
+ * - TRUE if everything is OK
+ *
+ * NOTE1 : Sometimes, the the only way to check the provided
+ * parameters is to start the data stream. If so,
+ * the data stream must not be started a second time 
+ * in the get_instance function.
+ * 
+ * NOTE2 : This string is provided in this function for fallback
+ * test only and should not be memorized by the GLU server
+ *
+ * NOTE3 : When there is not fallback stream at all, the value
+ * of fallback_argv  is 0. It is up to the GLU server
+ * to decide if it is acceptable for the provider to be 
+ * started with no fallback stream at all (it usually is
+ * acceptable)
+ *
+ * @param this, the GLU handle
+ * @param fallback_argc Number of fallback initialisation elements as used in main(argc, argv)
+ * @param fallback_argv Fallback initialisation elements as used in main(argc, argv)
+ * The first usefull parameter is always
+ * fallback_argv[1], so as the getopt* functions may be used to
+ * parse those parameters
+ * @return Return FALSE if a fatal error occur during initialisation
+ * or if there is a probleme with the provided parameters
+ */
+typedef int                (* GLU_init_ft              )(struct GLU_handle_t* this,int fallback_argc, char* fallback_argv[]);
+/**
+ * Start the loop that will push data to datapool with pus_next_item
+ * 
+ * @return status 
+ */
+typedef int                (* GLU_start_ft             )(struct GLU_handle_t* this);
+/** 
+ * GLU_get_provider_global_indexes provider global indexes corresponding
+ * to given symbol list. Used to validate client provided symbol list
+ * @param symbol_list IN the symbol list to validate
+ * @param pg_indexes OUT array containing corresponding provider global indexes or -1 if not found 
+ * @return TRUE if all symbol found, else return FALSE 
+ */
+typedef int                (* GLU_get_pgi_ft           )(struct GLU_handle_t* this, TSP_sample_symbol_info_list_t* symbol_list, int* pg_indexes);
+/**
+ * List of symbols managed by the GLU.
+ * @param this Handle for the GLU (when the GLU is ACTIVE, it is always equal to GLU_GLOBAL_HANDLE)
+ * @param symbol_list List of symbols
+ * @return TRUE of FALSE. TRUE = OK;
+ */
+typedef int                (* GLU_get_ss_info_list_ft  )(struct GLU_handle_t* this, TSP_sample_symbol_info_list_t* symbol_list);
+
+/** 
+ * GLU handle object.
+ * This object represents a GLU instance.
+ * It contains some minimal data and 
+ * function pointer which are 'methods' 
+ * for this object.
+ * GLU creation function provides a pre-initialize GLU_handle_t 
+ * structure with default implementation for some methods.
+ * Specific GLU implementation may overrides thoses methods
+ * with more efficient ones.
+ */
+typedef struct GLU_handle_t {
+
+  pthread_t                 tid;            /**< The GLU thread Id */
+  char*                     name;           /**< The GLU name */
+  GLU_server_type_t         type;           /**< The GLU type */
+  double                    base_frequency; /**< The provider base frequency */
+  
+
+  GLU_get_server_name_ft    get_name;           /**< name getter */
+  GLU_get_server_type_ft    get_type;           /**< type getter */
+  GLU_get_base_frequency_ft get_base_frequency; /**< base frequency getter */
+  GLU_get_instance_ft       get_instance;       /**< instance getter */
+  GLU_init_ft               initialize;
+  GLU_start_ft              start;
+  GLU_get_pgi_ft            get_pgi;
+  GLU_get_ss_info_list_ft   get_ssi_list;
+  
+} GLU_handle_t;
 
 /**
-* List of symbols managed by the GLU.
-* @param h_glu Handle for the GLU (when the GLU is ACTIVE, it is always equal to GLU_GLOBAL_HANDLE)
-* @param symbol_list List of symbols
-* @return TRUE of FALSE. TRUE = OK;
-*/
-int  GLU_get_sample_symbol_info_list(GLU_handle_t h_glu, TSP_sample_symbol_info_list_t* symbol_list);
-
+ * Create a GLU_handle. 
+ * This will provide some default implementation for member function.
+ * @param glu OUT, pointer to a GLU_handle pointer that will be allocated
+ * @return TRUE if ok FALSE otherwise
+ */
+int32_t GLU_handle_create(GLU_handle_t** glu, const char* name, const GLU_server_type_t type, const double base_frequency);
 
 /**
-* GLU base frequency
-* @return GLU base frequency (Hz)
-*/
-double GLU_get_base_frequency(void);
+ * Destroy a GLU_handle.
+ * for member function.
+ * @param glu OUT, pointer to a GLU_handle pointer that will be allocated
+ * @return TRUE if ok FALSE otherwise
+ */
+int32_t GLU_handle_destroy(GLU_handle_t** glu);
 
+/* ====== You'll find hereafter some default implementation GLU methods ====== */
 
+/** 
+ * Default GLU server name.
+ * @param this the GLU structure
+ * @return GLU name.
+ */
+char* GLU_get_server_name_default(GLU_handle_t* this);
+
+/**
+ * Default GLU server type.
+ * @param this the GLU structure
+ * @return GLU server type.
+ */
+GLU_server_type_t GLU_get_server_type_default(GLU_handle_t* this);
+
+/**
+ * Default GLU base frequency.
+ * @param this the GLU structure
+ * @return GLU base frequency (Hz)
+ */
+double GLU_get_base_frequency_default(GLU_handle_t* this);
+
+/** 
+ * Default GLU_get_pgi.
+ * The default implementation use the mandatory GLU_get_sample_symbol_info_list
+ * and does a linear search in it.
+ * @param this IN, 
+ * @param symbol_list IN the symbol list to validate
+ * @param pg_indexes OUT array containing corresponding provider global indexes or -1 if not found 
+ * @return TRUE if all symbol found, else return FALSE 
+ */
+int GLU_get_pgi_default(GLU_handle_t* this, TSP_sample_symbol_info_list_t* symbol_list, int* pg_indexes);
+
+/**
+ * Default GLU_get_instance.
+ * The default implementation is only valid for an ACTIVE GLU.
+ * In this case this function always return this.
+ * PASSIVE GLU should reimplement this function.
+ */ 
+GLU_handle_t* GLU_get_instance_default(GLU_handle_t* this,
+                                       int custom_argc,
+	 		               char* custom_argv[],
+			               char** error_info);
 
 /** @} */
 
@@ -249,21 +330,6 @@ double GLU_get_base_frequency(void);
 
 /* Might be remove
 int GLU_add_block(GLU_handle_t h_glu,int provider_global_index, xdr_and_sync_type_t type);
-
 int GLU_commit_add_block(GLU_handle_t h_glu);
 */
 
-/* Has been removed  
-GLU_get_state_t GLU_get_next_item(GLU_handle_t h_glu,glu_item_t* item); */
-
-/**
-* The GLU must forget all bufferized data.
-* The provider may call this function to empty the GLU
-* buffer data (it means that when GLU_get_next_item 
-* is called just after this function, GLU_get_next_item
-* cannot return GLU_GET_DATA_LOST as all the buffers of the GLU
-* should be empty)
-* This function is meaningless for a PASSIVE GLU (it should do nothing in this case)
-* @param h_glu Handle for the GLU (when the GLU is ACTIVE, it is always equal to GLU_GLOBAL_HANDLE)
-*/
-/*void GLU_forget_data(GLU_handle_t h_glu);*/

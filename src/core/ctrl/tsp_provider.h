@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Id: tsp_provider.h,v 1.12.4.1 2005/09/17 17:35:04 erk Exp $
+$Id: tsp_provider.h,v 1.12.4.2 2005/09/18 16:51:12 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -40,6 +40,7 @@ Purpose   : Main interface for the producer module
 
 #include "tsp_prjcfg.h"
 #include "tsp_datastruct.h"
+#include "glue_sserver.h"
 
 /**
  * @defgroup Provider
@@ -52,10 +53,13 @@ Purpose   : Main interface for the producer module
 /**
  * Initialize TSP provider library.
  * One should call this before any other TSP provider lib call.
+ * @param theGLU INOUT, the GLU to be used by this provider.
  * @param argc INOUT, the number of argument of the main
  * @param argv INOUT, array of argument of size argc.
  */
-int TSP_provider_private_init(int* argc, char** argv[]);
+int TSP_provider_private_init(GLU_handle_t* theGLU, int* argc, char** argv[]);
+
+const char* TSP_provider_get_name();
 
 
 void TSP_provider_request_open(const TSP_request_open_t* req_open,

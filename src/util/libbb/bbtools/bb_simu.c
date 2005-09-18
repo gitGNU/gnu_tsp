@@ -107,7 +107,7 @@ main (int argc, char ** argv) {
     Tata[i] = cos(*Titi/(i+1));
   }
 
-#define HUGE_ARRAY
+#undef HUGE_ARRAY
 #ifdef HUGE_ARRAY
 #define BIG_SIZE 200000
 #else

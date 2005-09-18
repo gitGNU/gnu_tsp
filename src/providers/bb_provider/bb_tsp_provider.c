@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/providers/bb_provider/bb_tsp_provider.c,v 1.10.4.1 2005/09/17 17:35:07 erk Exp $
+$Header: /sources/tsp/tsp/src/providers/bb_provider/bb_tsp_provider.c,v 1.10.4.2 2005/09/18 16:51:12 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -68,8 +68,6 @@ int TSP_provider_rqh_manager_get_nb_running();
 /*
  * Some static
  */
-/* Provider name */
-static char* X_server_name = "BB-TSP-V0_3";
 /* The sample symbol list */
 static TSP_sample_symbol_info_t *X_sample_symbol_info_list_val = NULL;
 
@@ -95,27 +93,21 @@ static S_BB_DATADESC_T** bbdatadesc_by_pgi = NULL;
  * TSP does not hanlde every BB data type.
  */ 
 static int32_t* bbindex_to_pgi = NULL;
+
 /*
  * The provider base frequency should the one of the simulator
  * which could be published IN the blackboard itself 
  * we gives a default one, which may not correspond to a "real one".
  */
+/*
 static double frequence_provider = 64.0;
 static double* bb_tsp_provider_frequency = &frequence_provider;
+*/
 
-int GLU_set_base_frequency(double d_frequence_provider) {
-  *bb_tsp_provider_frequency = d_frequence_provider;
-  return 0;
-}
-
-char* 
-GLU_get_server_name() {
-  return X_server_name;
-}
-
+static GLU_handle_t* bbGLU = NULL;
 
 int 
-GLU_init(int fallback_argc, char* fallback_argv[]) {
+BB_GLU_init(GLU_handle_t* this, int fallback_argc, char* fallback_argv[]) {
 
   int retcode;
   int i;
@@ -242,20 +234,7 @@ GLU_init(int fallback_argc, char* fallback_argv[]) {
   } /* loop over bb items */
     
   return retcode;
-} /* end of GLU_init */
-
-
-/*
- * C'est un provider actif car il dépend
- * d'une simulation potentiellement temps réelle et 
- * n'attendra donc pas que les éventuels consumer
- * consomment ce qu'ils ont demandés pour produire.
- * Si les consumers sont trop lents ils perdront des données
- * le provider ne s'arrêtera pas.
- */ 
-GLU_server_type_t GLU_get_server_type(void) {
-  return GLU_SERVER_TYPE_ACTIVE;
-}
+} /* end of BB_GLU_init */
 
 
 int  GLU_get_symbol_number(void) {
@@ -265,7 +244,7 @@ int  GLU_get_symbol_number(void) {
 }  /* end of GLU_get_symbol_number */
 
 int  
-GLU_get_sample_symbol_info_list(GLU_handle_t h_glu, 
+BB_GLU_get_sample_symbol_info_list(GLU_handle_t* h_glu, 
 				TSP_sample_symbol_info_list_t* symbol_list) {
 
   symbol_list->TSP_sample_symbol_info_list_t_len = GLU_get_symbol_number();
@@ -274,13 +253,8 @@ GLU_get_sample_symbol_info_list(GLU_handle_t h_glu,
   return TRUE;
 }
 
-double 
-GLU_get_base_frequency(void) {
-  return *bb_tsp_provider_frequency;
-}
-
 int 
-GLU_get_provider_global_indexes(TSP_sample_symbol_info_list_t* symbol_list, int* pg_indexes) {
+BB_GLU_get_pgi(GLU_handle_t* this, TSP_sample_symbol_info_list_t* symbol_list, int* pg_indexes) {
   
   int     i=0;
   int     ret=TRUE;
@@ -346,7 +320,7 @@ GLU_get_provider_global_indexes(TSP_sample_symbol_info_list_t* symbol_list, int*
   return ret;
 }
 
-static void* GLU_thread(void* arg) {
+static void* BB_GLU_thread(void* arg) {
   
   int i;
   glu_item_t item;
@@ -406,38 +380,36 @@ static void* GLU_thread(void* arg) {
 
   return NULL;
   
-} /* end of GLU_thread */
+} /* end of BB_GLU_thread */
 
-int GLU_start(void)
+int 
+BB_GLU_start(GLU_handle_t* this)
 {
   if (0==glu_thread_id) {
-    return pthread_create(&glu_thread_id, NULL, GLU_thread, NULL); 
+    return pthread_create(&glu_thread_id, NULL, BB_GLU_thread, NULL); 
   } else {
     return 1;
   }
-}
-
-GLU_handle_t 
-GLU_get_instance(int custom_argc,
-		 char* custom_argv[],
-		 char** error_info) {
-
-  if(error_info)
-    *error_info = "";
-
-  return GLU_GLOBAL_HANDLE;
-}  /* end of GLU_get_instance */
-
+} /* end of BB_GLU_thread */
 
 int32_t 
 bb_tsp_provider_initialise(int* argc, char** argv[],int TSPRunMode, const char* bbname) {
   
   int32_t retcode;
+
+  /* create a default GLU */
+  GLU_handle_create(&bbGLU,"BB-TSP-V0_4",GLU_SERVER_TYPE_ACTIVE,64.0);
+
+  /* now override default methods with more efficient BB specific methods */
+  bbGLU->initialize   = &BB_GLU_init;
+  bbGLU->start        = &BB_GLU_start;
+  bbGLU->get_ssi_list = &BB_GLU_get_sample_symbol_info_list;
+  bbGLU->get_pgi      = &BB_GLU_get_pgi;
   
   retcode = E_OK;
   the_bbname = strdup(bbname);
   /* Init LibTSP provider */
-  TSP_provider_init(argc, argv);  
+  TSP_provider_init(bbGLU,argc, argv);  
   /* demarrage provider */
   TSP_provider_run(TSPRunMode);
   /* 

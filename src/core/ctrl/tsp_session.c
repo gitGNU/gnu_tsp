@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/core/ctrl/tsp_session.c,v 1.18.4.1 2005/09/17 17:35:05 erk Exp $
+$Header: /sources/tsp/tsp/src/core/ctrl/tsp_session.c,v 1.18.4.2 2005/09/18 16:51:12 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 -----------------------------------------------------------------------
 
 Project   : TSP
-Maintainer : tsp@astrium-space.com
+Maintainer : tsp@astrium.eads.net
 Component : Provider
 
 -----------------------------------------------------------------------
@@ -72,7 +72,7 @@ struct TSP_session_data_t
   TSP_datapool_t datapool;
 
   /** Handle on glu server instance (could be global or specific to session ) */
-  GLU_handle_t glu_h;
+  GLU_handle_t* glu_h;
 
   /** Total number of symbols in glu server */
   int symbols_number;
@@ -204,7 +204,7 @@ int TSP_session_get_nb_session(void)
   return client_number;
 }
 
-int TSP_add_session(channel_id_t* new_channel_id, GLU_handle_t glu_h)
+int TSP_add_session(channel_id_t* new_channel_id, GLU_handle_t* glu_h)
 {
   channel_id_t channel_id = (channel_id_t)(UNDEFINED_CHANNEL_ID);
   
@@ -240,9 +240,9 @@ int TSP_add_session(channel_id_t* new_channel_id, GLU_handle_t glu_h)
   X_session_t[X_session_nb].session_data->glu_h = glu_h; 
 
   /* Get symbols number */
-  if(!GLU_get_sample_symbol_info_list(glu_h,&symbol_list))
+  if(!glu_h->get_ssi_list(glu_h,&symbol_list))
     {
-      STRACE_ERROR(("Function GLU_get_sample_symbol_info_list failed"));
+      STRACE_ERROR(("Function GLU_handle_t::get_ssi_list failed"));
       return FALSE;
     }
     X_session_t[X_session_nb].session_data->symbols_number = symbol_list.TSP_sample_symbol_info_list_t_len; 
@@ -288,7 +288,7 @@ int TSP_session_create_symbols_table_by_channel(const TSP_request_sample_t* req_
   TSP_session_destroy_symbols_table(session);    
     
   /* Use global datapool */
-  target_datapool = TSP_global_datapool_get_instance();
+  target_datapool = TSP_global_datapool_get_instance(session->session_data->glu_h);
 
   /* Creating group table*/
   ret  = TSP_group_algo_create_symbols_table(&(req_sample->symbols),
@@ -329,7 +329,7 @@ int  TSP_session_get_sample_symbol_info_list_by_channel(channel_id_t channel_id,
 	
   TSP_GET_SESSION(session, channel_id, FALSE);
 
-  ret = GLU_get_sample_symbol_info_list(session->session_data->glu_h, symbol_list);
+  ret = (session->session_data->glu_h)->get_ssi_list(session->session_data->glu_h, symbol_list);
   
   TSP_UNLOCK_MUTEX(&X_session_list_mutex,FALSE);
   
@@ -471,7 +471,7 @@ int TSP_session_create_data_sender_by_channel(channel_id_t channel_id, int no_fi
     {
       /* There is one single data pool, ask for a ringbuf to the socket layer */
       /* We calculate it with the server frequency */
-      double base_frequency = GLU_get_base_frequency();
+      double base_frequency = (session->session_data->glu_h)->get_base_frequency(session->session_data->glu_h);
        if( base_frequency > 0 )
 	{
 	  ringbuf_size = TSP_STREAM_SENDER_RINGBUF_SIZE * base_frequency;
@@ -598,6 +598,7 @@ int TSP_session_get_symbols_global_index_by_channel(channel_id_t channel_id,
     int ret=TRUE;
     TSP_LOCK_MUTEX(&X_session_list_mutex,FALSE);
     TSP_GET_SESSION(session, channel_id, FALSE);
+    GLU_handle_t* myGLU;
     
     int* pg_indexes = calloc( symbol_list->TSP_sample_symbol_info_list_t_len, sizeof(int) );
     
@@ -607,7 +608,8 @@ int TSP_session_get_symbols_global_index_by_channel(channel_id_t channel_id,
     }
   
     /* Get global provider indexes */
-    if (GLU_get_provider_global_indexes(symbol_list,pg_indexes) == FALSE) {
+    myGLU = session->session_data->glu_h;
+    if (myGLU->get_pgi(myGLU,symbol_list,pg_indexes) == FALSE) {
       STRACE_ERROR(("Some symbols have not been found"));
       ret=FALSE;
     }

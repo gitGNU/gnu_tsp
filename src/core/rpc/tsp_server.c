@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/core/rpc/tsp_server.c,v 1.22.4.1 2005/09/17 17:35:07 erk Exp $
+$Header: /sources/tsp/tsp/src/core/rpc/tsp_server.c,v 1.22.4.2 2005/09/18 16:51:12 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -74,7 +74,7 @@ TSP_provider_info_t* tsp_provider_information_1_svc(struct svc_req *rqstp)
 {
   static TSP_provider_info_t server_info;	
   STRACE_IO(("-->IN"));    
-  server_info.info = GLU_get_server_name();    
+  server_info.info = TSP_provider_get_name();    
   STRACE_IO(("-->OUT"));
   return &server_info;
 }
@@ -295,7 +295,7 @@ int TSP_rpc_request_config(TSP_provider_request_handler_t* this)
   else
     {
       gethostname(hostname, MAXHOSTNAMELEN);
-      servername = GLU_get_server_name();
+      servername = TSP_provider_get_name();
       
       sprintf(config->url, /* TSP_URL_MAXLENGTH, pour snprintf quand Solaris 2.5 sera mort */
 	       TSP_URL_FORMAT, TSP_RPC_PROTOCOL, hostname, servername, config->server_number);

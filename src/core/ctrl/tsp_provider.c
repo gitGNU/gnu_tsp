@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Id: tsp_provider.c,v 1.25.4.1 2005/09/17 17:35:04 erk Exp $
+$Id: tsp_provider.c,v 1.25.4.2 2005/09/18 16:51:12 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -50,6 +50,8 @@ static  char** X_argv = 0;
 /** Default values for args to the GLU */
 static  char** X_glu_argv = 0;
 static  int X_glu_argc = 0;
+
+static  GLU_handle_t* firstGLU = NULL;
 
 /** server base number is an offset allowing to distinguish TSP providers **/
 /** each Request handler shall look for a channel number from this offset,
@@ -214,7 +216,7 @@ static int TSP_cmd_line_parser(int* argc, char** argv[])
     }
 
   /* Memorize GLU type */
-  if (  GLU_SERVER_TYPE_ACTIVE == GLU_get_server_type() )
+  if (  GLU_SERVER_TYPE_ACTIVE == firstGLU->get_type(firstGLU) )
     X_glu_is_active = TRUE;
   else
     X_glu_is_active = FALSE;
@@ -236,11 +238,16 @@ int TSP_provider_get_server_base_number(void)
   return  X_server_base_number;
 }
 
+const char* TSP_provider_get_name() {
+  assert(firstGLU);
+  return firstGLU->get_name(firstGLU);
+}
+
 
 void TSP_provider_request_open(const TSP_request_open_t* req_open,
 		      TSP_answer_open_t* ans_open)
 {
-  GLU_handle_t glu_h;
+  GLU_handle_t* glu_h;
   char* error_info;
   int i;
 	
@@ -273,12 +280,12 @@ void TSP_provider_request_open(const TSP_request_open_t* req_open,
    /*  get GLU instance. If a stream init is provided, use it, else, use default */   
    if( 0 != req_open->argv.TSP_argv_t_len )
      {
-       glu_h = GLU_get_instance(req_open->argv.TSP_argv_t_len, req_open->argv.TSP_argv_t_val, &error_info);
+       glu_h = firstGLU->get_instance(firstGLU, req_open->argv.TSP_argv_t_len, req_open->argv.TSP_argv_t_val, &error_info);
      }
    else
      {
        /* use fallback if provided */
-       glu_h = GLU_get_instance(X_glu_argc, X_glu_argv, &error_info);
+       glu_h = firstGLU->get_instance(firstGLU, X_glu_argc, X_glu_argv, &error_info);
      }
 
    
@@ -344,13 +351,13 @@ void  TSP_provider_request_information(TSP_request_information_t* req_info,
  			      TSP_answer_sample_t* ans_sample)
 {
   int ret;
-  TSP_LOCK_MUTEX(&X_tsp_request_mutex,);
+  TSP_LOCK_MUTEX(&X_tsp_request_mutex,);  
   
   ans_sample->version_id = TSP_VERSION;
   ans_sample->channel_id = req_info->channel_id;
   ans_sample->status = TSP_STATUS_ERROR_UNKNOWN;
   ans_sample->provider_group_number = 0;
-  ans_sample->base_frequency = GLU_get_base_frequency();
+  ans_sample->base_frequency = firstGLU->get_base_frequency(firstGLU);
   ans_sample->max_client_number = TSP_MAX_CLIENT_NUMBER;
   ans_sample->current_client_number = TSP_session_get_nb_session();
   ans_sample->max_period = TSP_MAX_PERIOD;
@@ -398,7 +405,7 @@ void  TSP_provider_request_sample(TSP_request_sample_t* req_sample,
   ans_sample->channel_id            = req_sample->channel_id;
   ans_sample->status                = TSP_STATUS_ERROR_UNKNOWN;
   ans_sample->provider_group_number = 0;
-  ans_sample->base_frequency        = GLU_get_base_frequency();
+  ans_sample->base_frequency        = firstGLU->get_base_frequency(firstGLU);
   ans_sample->max_client_number     = TSP_MAX_CLIENT_NUMBER;
   ans_sample->current_client_number = TSP_session_get_nb_session();
   ans_sample->max_period            = TSP_MAX_PERIOD;
@@ -415,7 +422,7 @@ void  TSP_provider_request_sample(TSP_request_sample_t* req_sample,
 	  if(TSP_session_create_symbols_table_by_channel(req_sample, ans_sample)) 
 	    {
 	      ans_sample->status = TSP_STATUS_OK;
-	      GLU_start(); /* FIXME Y.D : Why start now the thread */
+	      firstGLU->start(firstGLU); /* FIXME Y.D : Why start now the thread */
 	    }
 	  else  
 	    {
@@ -545,13 +552,16 @@ void* TSP_provider_garbage_collector_thread(void* dummy)
 }
 
 
-int TSP_provider_private_init(int* argc, char** argv[])
+int TSP_provider_private_init(GLU_handle_t* theGLU, int* argc, char** argv[])
 {
   int ret = TRUE;
   int status;
   pthread_t thread;
   assert(argc);
   assert(argv);
+  assert(theGLU);
+
+  firstGLU = theGLU;
   
   ret = TSP_cmd_line_parser(argc, argv);
   if(ret)
@@ -560,7 +570,7 @@ int TSP_provider_private_init(int* argc, char** argv[])
       TSP_session_init();
 
       /* Initialise GLU server */
-      ret = GLU_init(X_glu_argc, X_glu_argv);
+      ret = theGLU->initialize(theGLU, X_glu_argc, X_glu_argv);
 
       /* Launch garbage collection for sessions */
       status = pthread_create(&thread, NULL, TSP_provider_garbage_collector_thread,  NULL);

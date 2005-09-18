@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Id: glue_sserver.h,v 1.19.4.2 2005/09/18 16:51:12 erk Exp $
+$Id: glue_sserver.h,v 1.19.4.3 2005/09/18 22:20:29 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -216,6 +216,12 @@ typedef int                (* GLU_init_ft              )(struct GLU_handle_t* th
  * 
  * @return status 
  */
+typedef void*              (* GLU_run_ft               )(void* this);
+/**
+ * Start the loop that will push data to datapool with pus_next_item
+ * 
+ * @return status 
+ */
 typedef int                (* GLU_start_ft             )(struct GLU_handle_t* this);
 /** 
  * GLU_get_provider_global_indexes provider global indexes corresponding
@@ -232,7 +238,42 @@ typedef int                (* GLU_get_pgi_ft           )(struct GLU_handle_t* th
  * @return TRUE of FALSE. TRUE = OK;
  */
 typedef int                (* GLU_get_ss_info_list_ft  )(struct GLU_handle_t* this, TSP_sample_symbol_info_list_t* symbol_list);
+/**
+ * Get the number of symbols managed by the GLU.
+ * @param this Handle for the GLU (when the GLU is ACTIVE, it is always equal to GLU_GLOBAL_HANDLE)
+ * @return the number of symbols;
+ */
+typedef int                (* GLU_get_nb_symbols_ft  )(struct GLU_handle_t* this);
 
+/**
+ * GLU asynchronous sample write.
+ * This function will be called by the provider for TSP_async_sample_write.
+ * The convention fixed is : if we can write with this function the sample
+ * represented by its provider_global_index (correct pgi and authorization by
+ * the GLU), the number returned is >0; else the number returned is <= 0
+ *
+ * @param pgi        IN, the index of the symbol concerned by the writing
+ * @param value_ptr  IN, the new value of the symbol
+ * @param value_size IN, the size of the value.
+ * @return >0 on success <=0 on failure
+ */
+typedef int                (* GLU_async_sample_write_ft)(struct GLU_handle_t* this, int pgi, void* value_ptr, int value_size);
+
+/**
+ * GLU asynchronous sample read.
+ * This function will be called by the provider for each TSP_async_sample_read.
+ * The convention fixed is : if we can write with this function the sample
+ * represented by its provider_global_index (correct pgi and authorization by
+ * the GLU), the number returned is >0; else the number returned is <= 0
+ *
+ * @param pgi        IN,  the index of the symbol concerned by the writing
+ * @param value_ptr  OUT, the new value of the symbol
+ * @param value_size INOUT, the size of the value.
+ * @return >0 on success <=0 on failure
+ */
+typedef int                (* GLU_async_sample_read_ft)(struct GLU_handle_t* this, int pgi, void* value_ptr, int* value_size);
+
+                
 /** 
  * GLU handle object.
  * This object represents a GLU instance.
@@ -257,9 +298,13 @@ typedef struct GLU_handle_t {
   GLU_get_base_frequency_ft get_base_frequency; /**< base frequency getter */
   GLU_get_instance_ft       get_instance;       /**< instance getter */
   GLU_init_ft               initialize;
+  GLU_run_ft                run;
   GLU_start_ft              start;
   GLU_get_pgi_ft            get_pgi;
   GLU_get_ss_info_list_ft   get_ssi_list;
+  GLU_get_nb_symbols_ft     get_nb_symbols; 
+  GLU_async_sample_read_ft  async_read;
+  GLU_async_sample_write_ft async_write;
   
 } GLU_handle_t;
 
@@ -302,6 +347,13 @@ GLU_server_type_t GLU_get_server_type_default(GLU_handle_t* this);
  */
 double GLU_get_base_frequency_default(GLU_handle_t* this);
 
+/**
+ * Default GLU start.
+ * @param this the GLU structure
+ * @return true or false
+ */
+int GLU_start_default(GLU_handle_t* this);
+
 /** 
  * Default GLU_get_pgi.
  * The default implementation use the mandatory GLU_get_sample_symbol_info_list
@@ -323,6 +375,15 @@ GLU_handle_t* GLU_get_instance_default(GLU_handle_t* this,
                                        int custom_argc,
 	 		               char* custom_argv[],
 			               char** error_info);
+
+int  
+GLU_get_nb_symbols_default(GLU_handle_t* this);
+
+int 
+GLU_async_sample_read_default(struct GLU_handle_t* this, int pgi, void* value_ptr, int* value_size);
+
+int 
+GLU_async_sample_write_default(struct GLU_handle_t* this, int pgi, void* value_ptr, int value_size);
 
 /** @} */
 

@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/providers/bb_provider/bb_tsp_provider.c,v 1.10.4.2 2005/09/18 16:51:12 erk Exp $
+$Header: /sources/tsp/tsp/src/providers/bb_provider/bb_tsp_provider.c,v 1.10.4.3 2005/09/18 22:20:29 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -61,9 +61,6 @@ int TSP_provider_rqh_manager_get_nb_running();
 
 #include <signal.h>
 
-/* RINGBUF_DECLARE_TYPE_DYNAMIC(glu_ringbuf,glu_item_t); */
-
-#define GLU_RING_BUFSIZE (1000 * 64 * 10)
 
 /*
  * Some static
@@ -117,8 +114,6 @@ BB_GLU_init(GLU_handle_t* this, int fallback_argc, char* fallback_argv[]) {
   int i_nb_item_scalaire;
 
   retcode = TRUE;
-  /* Le TID du GLU_thread */
-  glu_thread_id = 0;
   /* On n'a rien a faire des fallback pour l'instant */
   /* 
    * !!! On n'a besoin de s'attacher au BB seulement 
@@ -320,7 +315,7 @@ BB_GLU_get_pgi(GLU_handle_t* this, TSP_sample_symbol_info_list_t* symbol_list, i
   return ret;
 }
 
-static void* BB_GLU_thread(void* arg) {
+void* BB_GLU_thread(GLU_handle_t* arg) {
   
   int i;
   glu_item_t item;
@@ -382,16 +377,6 @@ static void* BB_GLU_thread(void* arg) {
   
 } /* end of BB_GLU_thread */
 
-int 
-BB_GLU_start(GLU_handle_t* this)
-{
-  if (0==glu_thread_id) {
-    return pthread_create(&glu_thread_id, NULL, BB_GLU_thread, NULL); 
-  } else {
-    return 1;
-  }
-} /* end of BB_GLU_thread */
-
 int32_t 
 bb_tsp_provider_initialise(int* argc, char** argv[],int TSPRunMode, const char* bbname) {
   
@@ -402,7 +387,7 @@ bb_tsp_provider_initialise(int* argc, char** argv[],int TSPRunMode, const char* 
 
   /* now override default methods with more efficient BB specific methods */
   bbGLU->initialize   = &BB_GLU_init;
-  bbGLU->start        = &BB_GLU_start;
+  bbGLU->run          = &BB_GLU_thread;
   bbGLU->get_ssi_list = &BB_GLU_get_sample_symbol_info_list;
   bbGLU->get_pgi      = &BB_GLU_get_pgi;
   

@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/core/ctrl/Attic/glue_sserver.c,v 1.4.2.1 2005/09/18 16:51:12 erk Exp $
+$Header: /sources/tsp/tsp/src/core/ctrl/Attic/glue_sserver.c,v 1.4.2.2 2005/09/18 22:20:29 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -39,6 +39,7 @@ Purpose   : Implementation for the object GLU_handle_t
 
 #include <assert.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 #include <glue_sserver.h>
 
@@ -50,6 +51,7 @@ int32_t GLU_handle_create(GLU_handle_t** glu, const char* name, const GLU_server
   *glu = calloc(1,sizeof(GLU_handle_t));
   assert(*glu);
   /* set up field values */
+  (*glu)->tid            = 0;
   (*glu)->name           = strdup(name);
   (*glu)->type           = type;
   (*glu)->base_frequency = base_frequency;
@@ -73,10 +75,14 @@ int32_t GLU_handle_create(GLU_handle_t** glu, const char* name, const GLU_server
   }
 
   /*
-   * initialize, start and get_ssi_list do not have default
-   * get_pgi does.
+   * initialize, run and get_ssi_list do not have default
+   * start and get_pgi does.
    */
+  (*glu)->start              = &GLU_start_default;
   (*glu)->get_pgi            = &GLU_get_pgi_default;
+  (*glu)->get_nb_symbols     = &GLU_get_nb_symbols_default;
+  (*glu)->async_read         = &GLU_async_sample_read_default;
+  (*glu)->async_write        = &GLU_async_sample_write_default;
   
   return retcode;
 } /* end if GLU_handle_create */
@@ -108,9 +114,33 @@ GLU_get_base_frequency_default(struct GLU_handle_t* this) {
   return this->base_frequency;
 }
 
+GLU_handle_t* 
+GLU_get_instance_default(GLU_handle_t* this,
+			 int custom_argc,
+			 char* custom_argv[],
+			 char** error_info) {
+  
+  if (GLU_SERVER_TYPE_ACTIVE == (this->type)) {
+    return this;
+  } else {
+    return NULL;
+  }
+} /* end of GLU_get_instance_default */
+
+
+int  
+GLU_start_default(GLU_handle_t* this)
+{
+  if (0==this->tid) {
+    return pthread_create(&(this->tid), NULL, this->run, this); 
+  } else {
+    return 1;
+  }
+}
+
 int 
 GLU_get_pgi_default(GLU_handle_t* this, TSP_sample_symbol_info_list_t* symbol_list, int* pg_indexes) {
-  int ret = TRUE;
+  int retcode = TRUE;
   TSP_sample_symbol_info_list_t complete_symbol_list;
   int i;
   int j;
@@ -132,32 +162,41 @@ GLU_get_pgi_default(GLU_handle_t* this, TSP_sample_symbol_info_list_t* symbol_li
 	     {
 	       found = TRUE;
 	       looked_for->provider_global_index = compared->provider_global_index;
+	       pg_indexes[i]=looked_for->provider_global_index;
 	     }
 	   if(found) break;
+
 	 }
        if(!found)
 	 {
-	   ret = FALSE;
+	   retcode = FALSE;
 	   STRACE_INFO(("Unable to find symbol '%s'",  looked_for->name));
 	   break;	   
 	 }
      }
+  return retcode;
 } /* end of GLU_get_pgi_default */
 
-GLU_handle_t* 
-GLU_get_instance_default(GLU_handle_t* this,
-			 int custom_argc,
-			 char* custom_argv[],
-			 char** error_info) {
-  
-  if (GLU_SERVER_TYPE_ACTIVE == (this->type)) {
-    return this;
-  } else {
-    return NULL;
-  }
-} /* end of GLU_get_instance_default */
 
+int  
+GLU_get_nb_symbols_default(GLU_handle_t* this)
+{
+  int retval = 0;
+  TSP_sample_symbol_info_list_t complete_symbol_list;
+  this->get_ssi_list(this,&complete_symbol_list);
 
+  retval = complete_symbol_list.TSP_sample_symbol_info_list_t_len;
+  return retval;
+}
 
+int 
+GLU_async_sample_read_default(struct GLU_handle_t* this, int pgi, void* value_ptr, int* value_size) {
+  /* default GLU does not authorize async read for any symbol */
+  return -1;
+}
 
-
+int 
+GLU_async_sample_write_default(struct GLU_handle_t* this, int pgi, void* value_ptr, int value_size) {
+  /* default GLU does not authorize async write for any symbol */
+  return -1;
+}

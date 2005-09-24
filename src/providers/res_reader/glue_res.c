@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Id: glue_res.c,v 1.7.4.1 2005/09/18 23:25:38 erk Exp $
+$Id: glue_res.c,v 1.7.4.2 2005/09/24 15:35:59 erk Exp $
 
 -----------------------------------------------------------------------
  
@@ -233,6 +233,17 @@ double RES_GLU_get_base_frequency(GLU_handle_t* this)
   return obj->freq;
 }
 
+GLU_handle_t* 
+RES_GLU_get_instance(GLU_handle_t* this,
+			 int custom_argc,
+			 char* custom_argv[],
+			 char** error_info) {
+  
+
+    return this;
+
+} /* end of GLU_get_instance_default */
+
 GLU_handle_t* GLU_resreader_create() {
   
   /* create a default GLU */
@@ -245,7 +256,7 @@ GLU_handle_t* GLU_resreader_create() {
   res_GLU->get_base_frequency = &RES_GLU_get_base_frequency;
   res_GLU->start              = &RES_GLU_start;
   /* FIXME seems that resreader should have been multi-instance but has never been? */
-  res_GLU->get_instance       = &GLU_get_instance_default;
+  res_GLU->get_instance       = &RES_GLU_get_instance;
 
   return res_GLU;
 }

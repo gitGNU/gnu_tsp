@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/core/rpc/tsp_client.c,v 1.11 2004/11/09 22:33:01 erk Exp $
+$Header: /sources/tsp/tsp/src/core/rpc/tsp_client.c,v 1.11.4.1 2005/09/28 17:01:35 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -97,7 +97,6 @@ CLIENT* tsp_remote_open_progid(const char *target_name, int progid)
    
 
   STRACE_IO(("-->OUT"));
-
   return cl;
 	
 }
@@ -236,7 +235,7 @@ int TSP_request_close(const TSP_request_close_t* req_close, TSP_server_t server)
   TSP_STRACE_RPC_ERROR(server, result);
   
   STRACE_IO(("-->OUT"));
-	
+  	
   return result;
 }	
 
@@ -319,4 +318,74 @@ TSP_request_sample_destroy(const TSP_request_sample_destroy_t* req_sample,
   return result;
 }
 
+int* TSP_async_sample_write(const TSP_async_sample_t* async_sample_write, TSP_server_t server)
+{
+  int* result;
+  
+  STRACE_IO(("-->IN"));
+  
+
+  switch (async_sample_write->data.data_len) {
+  case 2: 
+    TSP_UINT16_TO_BE(*(uint16_t*)async_sample_write->data.data_val);	
+    break;
+  case 4: 
+    TSP_UINT32_TO_BE(*(uint32_t*)async_sample_write->data.data_val);	
+    break;
+  case 8:  
+    TSP_UINT64_TO_BE(*(uint64_t*)async_sample_write->data.data_val);
+    break;
+  default:
+    break;
+  }
+  
+  LOCAL_RPCCHECK_FALSE;
+  
+  STRACE_DEBUG(("TSP_CLIENT Before TspWrite : pgi %d value %f return %d",async_sample_write->provider_global_index,async_sample_write->data.data_val,result));
+
+  result = tsp_async_sample_write_1(*async_sample_write, server);
 	
+  STRACE_DEBUG(("TSP_CLIENT After TspWrite : pgi %d value %f return %d",async_sample_write->provider_global_index,async_sample_write->data.data_val,*(result)));
+  
+  TSP_STRACE_RPC_ERROR(server, result);
+	
+  STRACE_IO(("-->OUT"));
+  	
+ return result;
+}	
+
+TSP_async_sample_t* TSP_async_sample_read(const TSP_async_sample_t* async_sample_read, TSP_server_t server)
+{
+  TSP_async_sample_t* result;
+  
+  STRACE_IO(("-->IN"));
+  
+
+  switch (async_sample_read->data.data_len) {
+  case 2: 
+    TSP_UINT16_TO_BE(*(uint16_t*)async_sample_read->data.data_val);	
+    break;
+  case 4: 
+    TSP_UINT32_TO_BE(*(uint32_t*)async_sample_read->data.data_val);	
+    break;
+  case 8:  
+    TSP_UINT64_TO_BE(*(uint64_t*)async_sample_read->data.data_val);
+    break;
+  default:
+    break;
+  }
+  
+  LOCAL_RPCCHECK_FALSE;
+  
+  STRACE_DEBUG(("TSP_CLIENT Before TspWrite : pgi %d value %f return %d",async_sample_read->provider_global_index,async_sample_read->data.data_val,result));
+
+  result = tsp_async_sample_read_1(*async_sample_read, server);
+	
+  STRACE_DEBUG(("TSP_CLIENT After TspWrite : pgi %d value %f return %d",async_sample_read->provider_global_index,async_sample_read->data.data_val,*(result)));
+  
+  TSP_STRACE_RPC_ERROR(server, result);
+	
+  STRACE_IO(("-->OUT"));
+  	
+ return result;
+}	

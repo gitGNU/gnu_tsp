@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Id: tsp_provider.c,v 1.25.4.2 2005/09/18 16:51:12 erk Exp $
+$Id: tsp_provider.c,v 1.25.4.3 2005/09/28 17:01:35 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -587,3 +587,41 @@ int TSP_provider_private_init(GLU_handle_t* theGLU, int* argc, char** argv[])
   
   return ret;
 } /* End of TSP_provider_private_init */
+
+
+int TSP_provider_async_sample_write(TSP_async_sample_t* async_sample_write)
+{
+  int ret = TRUE;
+  STRACE_IO(("-->IN"));
+
+  STRACE_DEBUG(("TSP_PROVIDER Before TspWrite: pgi %d value %s return %d ",async_sample_write->provider_global_index,async_sample_write->data.data_val,ret ));
+  
+  ret = firstGLU->async_write(firstGLU,
+			      async_sample_write->provider_global_index,
+  			      async_sample_write->data.data_val,async_sample_write->data.data_len);
+
+  STRACE_DEBUG(("TSP_PROVIDER After TspWrite: pgi %d value %s return %d ",async_sample_write->provider_global_index,async_sample_write->data.data_val,ret ));
+  
+  STRACE_IO(("-->OUT"));
+  return ret;
+
+} /* End of TSP_async_sample_write */
+
+
+int TSP_provider_async_sample_read(TSP_async_sample_t* async_sample_read)
+{
+  int ret = TRUE;
+  STRACE_IO(("-->IN"));
+
+  STRACE_DEBUG(("TSP_PROVIDER Before TspWrite: pgi %d value %s return %d ",async_sample_read->provider_global_index,async_sample_read->data.data_val,ret ));
+  
+  ret = firstGLU->async_read(firstGLU,
+			     async_sample_read->provider_global_index,
+			     async_sample_read->data.data_val,async_sample_read->data.data_len);
+
+  STRACE_DEBUG(("TSP_PROVIDER After TspWrite: pgi %d value %s return %d ",async_sample_read->provider_global_index,async_sample_read->data.data_val,ret ));
+  
+  STRACE_IO(("-->OUT"));
+  return ret;
+
+} /* End of TSP_async_sample_read */

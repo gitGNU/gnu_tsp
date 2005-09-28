@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Id: tsp_consumer.h,v 1.19 2004/11/09 22:33:01 erk Exp $
+$Id: tsp_consumer.h,v 1.19.4.1 2005/09/28 17:01:35 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -137,6 +137,14 @@ struct TSP_consumer_information_t
 };
 
 typedef struct TSP_consumer_information_t TSP_consumer_information_t;
+
+typedef struct TSP_consumer_async_sample_t
+{
+    int provider_global_index;
+    void * value_ptr;
+    int    value_size;
+} TSP_consumer_async_sample_t;
+
 
 
 /** Opaque handle type for provider */
@@ -355,6 +363,13 @@ int TSP_consumer_request_sample_destroy(TSP_provider_t provider);
 int TSP_consumer_read_sample(TSP_provider_t provider,
 			     TSP_sample_t* sample,
 			     int* new_sample);
+
+
+int TSP_consumer_async_sample_write(TSP_provider_t provider,TSP_consumer_async_sample_t* async_sample_write);
+
+int TSP_consumer_async_sample_read(TSP_provider_t provider,TSP_consumer_async_sample_t* async_sample_read);
+
+
 
 /** @} end group Consumer */ 
     

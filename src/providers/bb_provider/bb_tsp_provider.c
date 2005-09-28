@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/providers/bb_provider/bb_tsp_provider.c,v 1.10.4.3 2005/09/18 22:20:29 erk Exp $
+$Header: /sources/tsp/tsp/src/providers/bb_provider/bb_tsp_provider.c,v 1.10.4.4 2005/09/28 17:01:35 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -92,6 +92,11 @@ static S_BB_DATADESC_T** bbdatadesc_by_pgi = NULL;
 static int32_t* bbindex_to_pgi = NULL;
 
 /*
+ * Boolean array for TSP_write right management
+ */
+static int* allow_to_write = NULL;
+
+/*
  * The provider base frequency should the one of the simulator
  * which could be published IN the blackboard itself 
  * we gives a default one, which may not correspond to a "real one".
@@ -179,11 +184,16 @@ BB_GLU_init(GLU_handle_t* this, int fallback_argc, char* fallback_argv[]) {
    */
   value_by_pgi = (void **) calloc(i_nb_item_scalaire,sizeof(void*));
   bbdatadesc_by_pgi = (S_BB_DATADESC_T **) calloc(i_nb_item_scalaire,sizeof(S_BB_DATADESC_T*));
-  bbindex_to_pgi = (int32_t *) calloc(bb_get_nb_item(shadow_bb),sizeof(int32_t));
+  bbindex_to_pgi = (int32_t *) calloc(bb_get_nb_item(shadow_bb),sizeof(int32_t));  
+  /*
+   * Allocate write 'right' management array
+   */
+  allow_to_write = (int *) calloc(i_nb_item_scalaire,sizeof(int));
 
   assert(value_by_pgi);	
   assert(bbdatadesc_by_pgi);	
   assert(bbindex_to_pgi);
+  assert(allow_to_write);
   /* initialize the provider global index to 0 */
   i_pg_index = 0;
   for (i=0; i<bb_get_nb_item(shadow_bb);++i) {
@@ -211,6 +221,7 @@ BB_GLU_init(GLU_handle_t* this, int fallback_argc, char* fallback_argv[]) {
 	  /* update data pointer with appropriate value */
 	  value_by_pgi[i_pg_index]  = ((void*) ((char*)bb_data(shadow_bb) + bb_data_desc(shadow_bb)[i].data_offset)) + j*bb_data_desc(shadow_bb)[i].type_size;
 	  bbdatadesc_by_pgi[i_pg_index] = &bb_data_desc(shadow_bb)[i];
+	  allow_to_write[i_pg_index]    = 0;
 	  ++i_pg_index;
 	}
       } 
@@ -221,6 +232,7 @@ BB_GLU_init(GLU_handle_t* this, int fallback_argc, char* fallback_argv[]) {
 	X_sample_symbol_info_list_val[i_pg_index].period = 1;
 	value_by_pgi[i_pg_index] = ((void*) ((char*)bb_data(shadow_bb) + bb_data_desc(shadow_bb)[i].data_offset));
 	bbdatadesc_by_pgi[i_pg_index] = &bb_data_desc(shadow_bb)[i];
+	allow_to_write[i_pg_index]    = 0;
 	++i_pg_index;
       }
     } else  { /* skip unhandled BB type */ 
@@ -377,6 +389,78 @@ void* BB_GLU_thread(GLU_handle_t* arg) {
   
 } /* end of BB_GLU_thread */
 
+int BB_GLU_async_sample_write(GLU_handle_t* glu, int provider_global_index, void* value_ptr, int value_size)
+{
+	S_BB_DATADESC_T data_desc;
+	char* value_char;
+	int retcode = 0;
+	double value;
+		
+	
+	STRACE_DEBUG(("BB_PROVIDER Before TspWrite : value %f return :%d",value_by_pgi[provider_global_index], retcode));
+	
+	/* FIXME : Should use the pgi to cast properly the data versus the real type */
+//	switch (value_size) {
+//	case 4:
+//	  value = *((float*)value_ptr);
+//	  break;
+//	case 8:
+//	  value = *((double*)value_ptr);
+//	  break;
+//	}
+
+	/*appel de la fonction*/
+	if(provider_global_index>=0 && provider_global_index<nb_symbols){		
+		if(allow_to_write[provider_global_index]==E_OK){
+			data_desc.type = bbdatadesc_by_pgi[provider_global_index]->type;
+			data_desc.data_offset = *((char*)value_by_pgi[provider_global_index]);
+			
+			value_char = (char*)value_ptr;
+			if(bb_value_write(the_bb,data_desc,value_char,0)==E_OK)
+			{
+			retcode = 1;
+			}
+			
+		}else{
+			STRACE_INFO(("GLU : pgi = %d is not alowed to be written",provider_global_index));
+		}
+	}else{
+		STRACE_INFO(("GLU : pgi = %d is not valid provider_global_index",provider_global_index));	
+	}
+
+	STRACE_DEBUG(("BB_PROVIDER After TspWrite : value %f return :%d",value_by_pgi[provider_global_index], retcode));
+
+	return retcode;
+} /* end of BB_GLU_async_sample_write */
+
+
+int32_t  
+bb_tsp_provider_allow_write_symbol(int provider_global_index){
+
+  int32_t retcode;
+  retcode = E_NOK;
+  
+  if(provider_global_index>=0 && provider_global_index<nb_symbols){
+  	allow_to_write[provider_global_index] = 1;
+	retcode = E_OK;
+  }	
+  return retcode;
+}
+
+
+int32_t  
+bb_tsp_provider_forbid_write_symbol(int provider_global_index){
+
+  int32_t retcode;
+  retcode = E_NOK;
+  
+  if(provider_global_index>=0 && provider_global_index<nb_symbols){
+  	allow_to_write[provider_global_index] = 1;
+	retcode = E_OK;
+  }	
+  return retcode;
+}
+
 int32_t 
 bb_tsp_provider_initialise(int* argc, char** argv[],int TSPRunMode, const char* bbname) {
   
@@ -390,6 +474,7 @@ bb_tsp_provider_initialise(int* argc, char** argv[],int TSPRunMode, const char* 
   bbGLU->run          = &BB_GLU_thread;
   bbGLU->get_ssi_list = &BB_GLU_get_sample_symbol_info_list;
   bbGLU->get_pgi      = &BB_GLU_get_pgi;
+  bbGLU->async_write  = &BB_GLU_async_sample_write;
   
   retcode = E_OK;
   the_bbname = strdup(bbname);

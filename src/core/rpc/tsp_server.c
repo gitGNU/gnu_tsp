@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/core/rpc/tsp_server.c,v 1.22.4.2 2005/09/18 16:51:12 erk Exp $
+$Header: /sources/tsp/tsp/src/core/rpc/tsp_server.c,v 1.22.4.3 2005/09/28 17:01:35 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -94,7 +94,7 @@ TSP_answer_open_t* tsp_request_open_1_svc(TSP_request_open_t req_open, struct sv
 void *tsp_request_close_1_svc(TSP_request_close_t req_close, struct svc_req * rqstp)
 {
 
-  static char* dummy;
+  static char* dummy = NULL;
 	
   STRACE_IO(("-->IN"));
 
@@ -193,6 +193,76 @@ void* tsp_exec_feature_1_svc(TSP_exec_feature_t exec_feature, struct svc_req * r
   STRACE_IO(("-->OUT"));
 
   return (void*)NULL;
+}
+
+int * tsp_async_sample_write_1_svc(TSP_async_sample_t async_sample_write, struct svc_req * rqstp)
+{
+  static int ret = TRUE;
+  
+  STRACE_IO(("-->IN"));	
+
+  /* endianity managment*/
+  STRACE_DEBUG(("Len=%d,  pgi = %d value = %f et ret = %d", async_sample_write.data.data_len, async_sample_write.provider_global_index,(double*)(async_sample_write.data.data_val),ret));
+
+  switch (async_sample_write.data.data_len) {
+  case 2: 
+      TSP_UINT16_FROM_BE(*(uint16_t*)async_sample_write.data.data_val);
+      break;
+  case 4: 
+      TSP_UINT32_FROM_BE(*(uint32_t*)async_sample_write.data.data_val);
+      break;
+  case 8:  
+      TSP_UINT64_FROM_BE(*(uint64_t*)async_sample_write.data.data_val);
+      break;
+  default:
+      break;
+  }
+	
+
+  STRACE_DEBUG(("TSP_SERVER Before TspWrite : pgi %d value %s return %d ",async_sample_write.provider_global_index,async_sample_write.data.data_val,ret ));
+  
+  ret = TSP_provider_async_sample_write(&async_sample_write);	
+  
+  STRACE_IO(("-->OUT"));
+  STRACE_DEBUG(("TSP_SERVER After TspWrite : pgi %d value %s return %d ",async_sample_write.provider_global_index,async_sample_write.data.data_val,ret ));
+
+  return &ret;
+  
+}
+
+TSP_async_sample_t * tsp_async_sample_read_1_svc(TSP_async_sample_t async_sample_read, struct svc_req * rqstp)
+{
+  static int ret = TRUE;
+  
+  STRACE_IO(("-->IN"));	
+
+  /* endianity managment*/
+  STRACE_DEBUG(("Len=%d,  pgi = %d value = %f et ret = %d", async_sample_read.data.data_len, async_sample_read.provider_global_index,(double*)(async_sample_read.data.data_val),ret));
+
+  switch (async_sample_read.data.data_len) {
+  case 2: 
+      TSP_UINT16_FROM_BE(*(uint16_t*)async_sample_read.data.data_val);
+      break;
+  case 4: 
+      TSP_UINT32_FROM_BE(*(uint32_t*)async_sample_read.data.data_val);
+      break;
+  case 8:  
+      TSP_UINT64_FROM_BE(*(uint64_t*)async_sample_read.data.data_val);
+      break;
+  default:
+      break;
+  }
+	
+
+  STRACE_DEBUG(("TSP_SERVER Before TspWrite : pgi %d value %s return %d ",async_sample_read.provider_global_index,async_sample_read.data.data_val,ret ));
+  
+  ret = TSP_provider_async_sample_read(&async_sample_read);	
+  
+  STRACE_IO(("-->OUT"));
+  STRACE_DEBUG(("TSP_SERVER After TspWrite : pgi %d value %s return %d ",async_sample_read.provider_global_index,async_sample_read.data.data_val,ret ));
+
+  return &ret;
+  
 }
 
 

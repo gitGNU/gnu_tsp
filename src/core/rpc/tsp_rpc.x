@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/core/rpc/tsp_rpc.x,v 1.17 2004/09/23 16:11:57 tractobob Exp $
+$Header: /sources/tsp/tsp/src/core/rpc/tsp_rpc.x,v 1.17.4.1 2005/09/28 17:01:35 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -226,16 +226,24 @@ struct TSP_request_sample_destroy_t
 struct TSP_answer_sample_destroy_t
 {
 	int version_id;
-	unsigned int channel_id;	
+	unsigned int channel_id;		
 	int status;
 };
 
+/* tsp async read/write */
+struct TSP_async_sample_t
+{
+	int provider_global_index;
+        opaque data<>;
+};
 
 
 /* This structure is not part of TSP Protocol*/
 struct TSP_provider_info_t{
 	string info<>;
 };
+
+
 
 
 /*------------------------------------------------------*/
@@ -268,6 +276,9 @@ program TSP_RPC {
 	TSP_answer_sample_destroy_t	TSP_REQUEST_SAMPLE_DESTROY(TSP_request_sample_destroy_t req_destroy) = 108;
 	
 	void				TSP_EXEC_FEATURE(TSP_exec_feature_t exec_feature) = 109;
+	
+	int 				TSP_ASYNC_SAMPLE_WRITE(TSP_async_sample_t async_sample_write) = 110;
+	TSP_async_sample_t              TSP_ASYNC_SAMPLE_READ(TSP_async_sample_t async_sample_read) = 111;
 	
 
 	} = 1;

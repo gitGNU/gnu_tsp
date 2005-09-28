@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/core/driver/tsp_consumer.c,v 1.32.2.1 2005/09/17 17:35:05 erk Exp $
+$Header: /sources/tsp/tsp/src/core/driver/tsp_consumer.c,v 1.32.2.2 2005/09/28 17:01:35 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -1247,3 +1247,81 @@ TSP_groups_t TSP_test_get_groups(TSP_provider_t provider)
   return otsp->groups;
 }
 
+
+int TSP_consumer_async_sample_write(TSP_provider_t provider,TSP_consumer_async_sample_t* async_sample_write)
+{
+ 
+  TSP_async_sample_t async_write;
+  int ret = 0;
+  TSP_otsp_t* otsp = (TSP_otsp_t*)provider;
+ 
+  /* As there are a two level structure for hidding all RPC stuff, we need to copy the struct fields */
+  
+  async_write.provider_global_index = async_sample_write->provider_global_index;
+  async_write.data.data_val = async_sample_write->value_ptr;
+  async_write.data.data_len = async_sample_write->value_size;
+  
+  /* verification of the structure*/
+  	
+     STRACE_DEBUG(("TSP_CONSUMER Before TspWrite : pgi %d value %f return %d",
+     async_write.provider_global_index,
+     async_write.data.data_val,ret));	
+
+  if(0 != otsp)
+    {
+    
+      ret = TSP_async_sample_write(&async_write,otsp->server);
+      
+    }
+  else
+    {
+      STRACE_ERROR(("This provider is not instanciate"));
+    }
+     STRACE_DEBUG(("TSP_CONSUMER After Tspwrite : pgi %d value %f return %d",
+     async_write.provider_global_index,
+     async_write.data.data_val,ret));
+     
+  STRACE_IO(("-->OUT"));
+	
+  return ret;
+	
+}
+
+int TSP_consumer_async_sample_read(TSP_provider_t provider,TSP_consumer_async_sample_t* async_sample_read)
+{
+ 
+  TSP_async_sample_t async_read;
+  int ret = 0;
+  TSP_otsp_t* otsp = (TSP_otsp_t*)provider;
+ 
+  /* As there are a two level structure for hidding all RPC stuff, we need to copy the struct fields */
+  
+  async_read.provider_global_index = async_sample_read->provider_global_index;
+  async_read.data.data_val = async_sample_read->value_ptr;
+  async_read.data.data_len = async_sample_read->value_size;
+  
+  /* verification of the structure*/
+  	
+     STRACE_DEBUG(("TSP_CONSUMER Before TspRead : pgi %d value %f return %d",
+     async_read.provider_global_index,
+     async_read.data.data_val,ret));	
+
+  if(0 != otsp)
+    {
+    
+      ret = TSP_async_sample_read(&async_read,otsp->server);
+      
+    }
+  else
+    {
+      STRACE_ERROR(("This provider is not instanciate"));
+    }
+     STRACE_DEBUG(("TSP_CONSUMER After TspRead : pgi %d value %f return %d",
+     async_read.provider_global_index,
+     async_read.data.data_val,ret));
+     
+  STRACE_IO(("-->OUT"));
+	
+  return ret;
+	
+}

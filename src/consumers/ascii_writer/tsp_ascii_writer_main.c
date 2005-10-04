@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/consumers/ascii_writer/tsp_ascii_writer_main.c,v 1.5.4.1 2005/09/17 17:30:45 erk Exp $
+$Header: /sources/tsp/tsp/src/consumers/ascii_writer/tsp_ascii_writer_main.c,v 1.5.4.2 2005/10/04 12:56:23 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -115,11 +115,12 @@ main (int argc, char* argv[]) {
   }
 
   if (!opt_ok) {
-    printf("Usage: %s -x=<sample_config_file> [-o=<output_filename>] [-l=<nb sample>] [-u=<TSP provider URL>]\n", argv[0]);
+    printf("Usage: %s -x=<sample_config_file> [-o=<output_filename>] [-l=<nb sample>] [-u=<TSP_URL>]\n", argv[0]);
     printf("   -x   the file specifying the list of symbols to be sampled\n");
     printf("   -o   the name of the output file\n");
     printf("   -l   (optional) the maximum number of sample to be stored in file\n");
-    printf("   -u   (optional) the  TSP provider URL <PROTOCOL://HOST/SERVER:PORT> \n");
+    printf("   -u   (optional) the  TSP provider URL <TSP_URL> \n");
+    printf("%s",TSP_URL_FORMAT_USAGE);
     exit(retcode);
   }
 

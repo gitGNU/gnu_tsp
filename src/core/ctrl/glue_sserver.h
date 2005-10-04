@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Id: glue_sserver.h,v 1.19.4.4 2005/09/18 23:25:37 erk Exp $
+$Id: glue_sserver.h,v 1.19.4.5 2005/10/04 12:57:17 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -52,6 +52,9 @@ Purpose   : Interface for the glue server : the data producer
  * the TSP provider lib in a real TSP provider.
  * @{
  */
+
+#define TSP_ASYNC_WRITE_ALLOWED   1
+#define TSP_ASYNC_WRITE_FORBIDDEN 0
 
 
 /** GLU server type */

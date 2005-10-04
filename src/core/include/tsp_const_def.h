@@ -1,6 +1,6 @@
 /*!  \file 
  
-$Header: /sources/tsp/tsp/src/core/include/tsp_const_def.h,v 1.29.2.1 2005/09/17 17:35:05 erk Exp $
+$Header: /sources/tsp/tsp/src/core/include/tsp_const_def.h,v 1.29.2.2 2005/10/04 16:51:37 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ Purpose   : definitions and const that must have a program wide scope
  * versio in binary executable. We should find a way to 
  * automatically change this when tagging... FIXME: erk
  */
-#define TSP_SOURCE_VERSION "0.6.5"
+#define TSP_SOURCE_VERSION "0.7.0"
 
 /** TSP Version */
 #define TSP_VERSION 1

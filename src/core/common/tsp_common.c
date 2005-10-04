@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Id: tsp_common.c,v 1.1.2.1 2005/09/17 17:35:04 erk Exp $
+$Id: tsp_common.c,v 1.1.2.2 2005/10/04 16:52:42 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -40,8 +40,15 @@ Purpose   : Main implementation for the producer module
 #include "tsp_datastruct.h"
 #include "tsp_simple_trace.h"
 #include "tsp_const_def.h"
-
+#define TSP_COMMON_C
 #include "tsp_common.h"
+
+void TSP_request_create(TSP_request_t* req, TSP_request_type_t req_type) {
+  assert(req);
+  req->version_id = TSP_VERSION;
+  req->req_type   = req_type;
+  req->req_data   = NULL;
+}
 
 void
 TSP_common_sample_symbol_info_list_copy(TSP_sample_symbol_info_list_t* dest_symbols, 

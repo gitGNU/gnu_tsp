@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/providers/bb_provider/bb_tsp_provider.c,v 1.10.4.5 2005/10/04 12:57:17 erk Exp $
+$Header: /sources/tsp/tsp/src/providers/bb_provider/bb_tsp_provider.c,v 1.10.4.6 2005/10/04 16:52:42 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -391,41 +391,34 @@ void* BB_GLU_thread(void* arg) {
 
 int BB_GLU_async_sample_write(GLU_handle_t* glu, int provider_global_index, void* value_ptr, int value_size)
 {
-	S_BB_DATADESC_T data_desc;
-	char* value_char;
-	int retcode = 0;       	
+	S_BB_DATADESC_T* data_desc;
+	int retcode = E_NOK;       	
+	double value;
+	char   strvalue[256];
 	
-	STRACE_DEBUG(("BB_PROVIDER Before AsyncWrite : value %f return :%d",*((double*)value_by_pgi[provider_global_index]), retcode));
+	
+	STRACE_INFO(("BB_PROVIDER want to AsyncWrite : pgi <%d> with value : 0x%X (value_size=%d)",provider_global_index, (uint32_t)value_ptr,value_size));
 	
 	/* FIXME : Should use the pgi to cast properly the data versus the real type */
-//	switch (value_size) {
-//	case 4:
-//	  value = *((float*)value_ptr);
-//	  break;
-//	case 8:
-//	  value = *((double*)value_ptr);
-//	  break;
-//	}
+	value = *(double*)value_ptr;
+	/* FIXME really ugly double to string convert used to easy bb_value_write */
+	sprintf(strvalue,"%0f",value);
 
-	/*appel de la fonction*/
-	if(provider_global_index>=0 && provider_global_index<nb_symbols){		
-		if(allow_to_write[provider_global_index]==TSP_ASYNC_WRITE_ALLOWED){
-			data_desc.type = bbdatadesc_by_pgi[provider_global_index]->type;
-			data_desc.data_offset = *((char*)value_by_pgi[provider_global_index]);
-			
-			value_char = (char*)value_ptr;
-			if(bb_value_write(the_bb,data_desc,value_char,0)==E_OK)
-			{
-			retcode = 1;
-			}
-			
-		} else {
-		  STRACE_INFO(("GLU : pgi = %d is not alowed to be written",provider_global_index));
-		}
+	/* try to write */
+	if (provider_global_index>=0 && provider_global_index<nb_symbols) {		
+	  if (allow_to_write[provider_global_index]==TSP_ASYNC_WRITE_ALLOWED) { 
+	    data_desc = bbdatadesc_by_pgi[provider_global_index];
+	    STRACE_INFO(("About to write on symbol <%s> value <%f> (strvalue=%s)...",data_desc->name,value,strvalue));
+	    if (bb_value_write(the_bb,*data_desc,strvalue,0)==E_OK) {
+	      retcode = E_OK;
+	    } 
+	  } else {
+	    STRACE_INFO(("BB_GLU : pgi = %d is not allowed to be written",provider_global_index));
+	  }
 	} else {
-	  STRACE_INFO(("GLU : pgi = %d is not valid provider_global_index",provider_global_index));	
+	  STRACE_INFO(("BB_GLU : pgi = %d is not valid provider_global_index",provider_global_index));	
 	}
-
+	
 	STRACE_DEBUG(("BB_PROVIDER After AsyncWrite : value %f return :%d",*((double*)value_by_pgi[provider_global_index]), retcode));
 
 	return retcode;

@@ -1,7 +1,7 @@
 
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/util/libbb/bb_tools.c,v 1.14 2005/08/26 21:01:17 erk Exp $
+$Header: /sources/tsp/tsp/src/util/libbb/bb_tools.c,v 1.14.2.1 2005/10/04 16:52:43 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -228,6 +228,9 @@ bbtools(bbtools_request_t* req) {
     }
   }
 
+  /* FIXME should assign retval using 
+   * retcode from bb_<cmd>
+   */
   switch (req->cmd) {
   case E_BBTOOLS_UNKNOWN:
     req->stream = stderr;

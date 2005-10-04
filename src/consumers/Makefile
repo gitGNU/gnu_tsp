@@ -7,8 +7,8 @@ SUBDIRS = \
 	test_group \
 	res_writer \
 	tutorial \
-	ascii_writer 
-#	generic -- not yet its coming...
+	ascii_writer \
+	generic
 
 ifeq (${BUILD_GTK_BASED_CONSUMER},yes)
 ifeq (${BUILD_XML2_CONFIG_USER},yes)

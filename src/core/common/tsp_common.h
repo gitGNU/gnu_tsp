@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Id: tsp_common.h,v 1.1.2.1 2005/09/17 17:35:04 erk Exp $
+$Id: tsp_common.h,v 1.1.2.2 2005/10/04 16:52:42 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -40,6 +40,71 @@ Purpose   : Main interface for the producer module
 
 #include "tsp_prjcfg.h"
 #include "tsp_datastruct.h"
+
+typedef enum TSP_request_type {
+  E_TSP_REQUEST_INVALID = 0,
+  E_TSP_REQUEST_GENERIC,
+  E_TSP_REQUEST_OPEN,
+  E_TSP_REQUEST_CLOSE,
+  E_TSP_REQUEST_INFORMATION,
+  E_TSP_REQUEST_FILTERED_INFORMATION,
+  E_TSP_REQUEST_FEATURE,
+  E_TSP_REQUEST_SAMPLE,
+  E_TSP_REQUEST_SAMPLE_INIT,
+  E_TSP_REQUEST_SAMPLE_DESTROY,
+  E_TSP_REQUEST_ASYNC_SAMPLE_WRITE,
+  E_TSP_REQUEST_ASYNC_SAMPLE_READ,
+  E_TSP_REQUEST_LAST
+} TSP_request_type_t;
+
+#ifdef TSP_COMMON_C
+const char* tsp_reqname_tab[] = {"tsp_request_invalid",
+				 "tsp_request_generic",
+				 "tsp_request_open",
+				 "tsp_request_close",
+				 "tsp_request_information",
+				 "tsp_request_filtered_information",
+				 "tsp_request_feature",
+				 "tsp_request_sample",
+				 "tsp_request_sample_init",
+				 "tsp_request_sample_destroy",
+				 "tsp_request_async_sample_write",
+				 "tsp_request_async_sample_read",
+				 "tsp_request_last"
+};
+
+const char* tsp_reqhelp_tab[] = {"invalid tsp request",
+				 "tsp_request_generic",
+				 "tsp_request_open",
+				 "tsp_request_close",
+				 "tsp_request_information",
+				 "tsp_request_filtered_information",
+				 "tsp_request_feature",
+				 "tsp_request_sample",
+				 "tsp_request_sample_init",
+				 "tsp_request_sample_destroy",
+				 "tsp_async_sample_write",
+				 "tsp_async_sample_read",
+				 "TSP LAST REQUEST"
+};
+#else
+extern const char* tsp_reqname_tab[];
+extern const char* tsp_reqhelp_tab[];
+#endif
+
+typedef struct TSP_request {
+  int                 version_id;
+  TSP_request_type_t    req_type;
+  void*                 req_data;
+} TSP_request_t;
+
+
+/**
+ * Initialize a TSP request.
+ * @param req 
+ * @param req_type
+ */
+void TSP_request_create(TSP_request_t* req, TSP_request_type_t req_type);
 
 void
 TSP_common_sample_symbol_info_list_copy(TSP_sample_symbol_info_list_t* dest_symbols, 

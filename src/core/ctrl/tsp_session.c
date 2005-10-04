@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/core/ctrl/tsp_session.c,v 1.18.4.2 2005/09/18 16:51:12 erk Exp $
+$Header: /sources/tsp/tsp/src/core/ctrl/tsp_session.c,v 1.18.4.3 2005/10/04 16:52:42 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -614,7 +614,7 @@ int TSP_session_get_symbols_global_index_by_channel(channel_id_t channel_id,
       ret=FALSE;
     }
     
-    /* Store all global indexes into list */
+    /* Store all global indexes into list including NOT FOUND ones */
     for ( i=0 ; i < symbol_list->TSP_sample_symbol_info_list_t_len ; i++ ) {
       symbol_list->TSP_sample_symbol_info_list_t_val[i].provider_global_index=pg_indexes[i];
       

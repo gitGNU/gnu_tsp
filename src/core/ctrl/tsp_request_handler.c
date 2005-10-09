@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Id: tsp_request_handler.c,v 1.1.2.1 2005/09/17 17:35:05 erk Exp $
+$Id: tsp_request_handler.c,v 1.1.2.2 2005/10/09 22:35:58 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -37,6 +37,7 @@ Purpose   : TSP request handling API
 
 #include "tsp_sys_headers.h"
 #include "tsp_request_handler.h"
+#include "tsp_time.h"
 
 int 
 TSP_provider_rqh_manager_get_max_nb(void) {

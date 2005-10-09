@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/core/ctrl/Attic/glue_sserver.c,v 1.4.2.2 2005/09/18 22:20:29 erk Exp $
+$Header: /sources/tsp/tsp/src/core/ctrl/Attic/glue_sserver.c,v 1.4.2.3 2005/10/09 22:35:58 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -80,6 +80,7 @@ int32_t GLU_handle_create(GLU_handle_t** glu, const char* name, const GLU_server
    */
   (*glu)->start              = &GLU_start_default;
   (*glu)->get_pgi            = &GLU_get_pgi_default;
+  (*glu)->get_filtered_ssi_list = &GLU_get_filtered_ssi_list_default;
   (*glu)->get_nb_symbols     = &GLU_get_nb_symbols_default;
   (*glu)->async_read         = &GLU_async_sample_read_default;
   (*glu)->async_write        = &GLU_async_sample_write_default;
@@ -187,6 +188,10 @@ GLU_get_nb_symbols_default(GLU_handle_t* this)
 
   retval = complete_symbol_list.TSP_sample_symbol_info_list_t_len;
   return retval;
+}
+
+int GLU_get_filtered_ssi_list_default(GLU_handle_t* this, int filter_kind, char* filter_string, TSP_sample_symbol_info_list_t* symbol_list) {
+  return this->get_ssi_list(this,symbol_list);
 }
 
 int 

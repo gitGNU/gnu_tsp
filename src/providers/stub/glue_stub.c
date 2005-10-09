@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Id: glue_stub.c,v 1.10.4.1 2005/09/18 22:20:29 erk Exp $
+$Id: glue_stub.c,v 1.10.4.2 2005/10/09 22:35:58 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -56,12 +56,13 @@ static tsp_hrtime_t X_lasttime;
 static time_stamp_t my_time = 0;
 static GLU_handle_t* stub_GLU = NULL;
 
-void* STUB_GLU_thread(GLU_handle_t* this)
+void* STUB_GLU_thread(void* athis)
 {
   int i, symbols_nb, *ptr_index;
   tsp_hrtime_t current_time;
   glu_item_t item;
   double memo_val[GLU_MAX_SYMBOLS]; /*for debug informatin */
+  GLU_handle_t* this  = (GLU_handle_t*) athis;
 
   current_time = X_lasttime = tsp_gethrtime();  
 

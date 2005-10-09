@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Id: glue_sserver.h,v 1.19.4.5 2005/10/04 12:57:17 erk Exp $
+$Id: glue_sserver.h,v 1.19.4.6 2005/10/09 22:35:58 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -240,7 +240,18 @@ typedef int                (* GLU_get_pgi_ft           )(struct GLU_handle_t* th
  * @param symbol_list List of symbols
  * @return TRUE of FALSE. TRUE = OK;
  */
-typedef int                (* GLU_get_ss_info_list_ft  )(struct GLU_handle_t* this, TSP_sample_symbol_info_list_t* symbol_list);
+typedef int                (* GLU_get_ssi_list_ft  )(struct GLU_handle_t* this, TSP_sample_symbol_info_list_t* symbol_list);
+
+/**
+ * Filtered list of symbols managed by the GLU.
+ * @param this Handle for the GLU (when the GLU is ACTIVE, it is always equal to GLU_GLOBAL_HANDLE)
+ * @param filter_kind the filter kind
+ * @param filter_string the filter string
+ * @param symbol_list List of symbols
+ * @return TRUE of FALSE. TRUE = OK;
+ */
+typedef int                (* GLU_get_filtered_ssi_list_ft)(struct GLU_handle_t* this, int filter_kind, char* filter_string, TSP_sample_symbol_info_list_t* symbol_list);
+
 /**
  * Get the number of symbols managed by the GLU.
  * @param this Handle for the GLU (when the GLU is ACTIVE, it is always equal to GLU_GLOBAL_HANDLE)
@@ -303,11 +314,12 @@ typedef struct GLU_handle_t {
   GLU_init_ft               initialize;
   GLU_run_ft                run;
   GLU_start_ft              start;
-  GLU_get_pgi_ft            get_pgi;
-  GLU_get_ss_info_list_ft   get_ssi_list;
-  GLU_get_nb_symbols_ft     get_nb_symbols; 
-  GLU_async_sample_read_ft  async_read;
-  GLU_async_sample_write_ft async_write;
+  GLU_get_pgi_ft                 get_pgi;
+  GLU_get_ssi_list_ft            get_ssi_list;
+  GLU_get_filtered_ssi_list_ft   get_filtered_ssi_list;
+  GLU_get_nb_symbols_ft          get_nb_symbols; 
+  GLU_async_sample_read_ft       async_read;
+  GLU_async_sample_write_ft      async_write;
   
 } GLU_handle_t;
 
@@ -381,6 +393,9 @@ GLU_handle_t* GLU_get_instance_default(GLU_handle_t* this,
 
 int  
 GLU_get_nb_symbols_default(GLU_handle_t* this);
+
+int 
+GLU_get_filtered_ssi_list_default(GLU_handle_t* this, int filter_kind, char* filter_string, TSP_sample_symbol_info_list_t* symbol_list);
 
 int 
 GLU_async_sample_read_default(struct GLU_handle_t* this, int pgi, void* value_ptr, int* value_size);

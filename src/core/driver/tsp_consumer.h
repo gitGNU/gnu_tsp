@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Id: tsp_consumer.h,v 1.19.4.1 2005/09/28 17:01:35 erk Exp $
+$Id: tsp_consumer.h,v 1.19.4.2 2005/10/09 22:35:58 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -291,6 +291,18 @@ int TSP_consumer_request_close(TSP_provider_t provider);
  */				  
 int TSP_consumer_request_information(TSP_provider_t provider);
 
+/** 
+ * Request provider information.
+ * Ask the provider informations about several parameters, including
+ * the available symbol list that can be asked.
+ * This function should be called multiple times only to refresh
+ * the structure returned by the TSP_consumer_get_information function.
+ * @param provider The provider handle
+ * @param filter_kind the kind of filter
+ * @param filter_string the filter string
+ * @return TRUE or FALSE. TRUE = OK.
+ */				  
+int TSP_consumer_request_filtered_information(TSP_provider_t provider, int filter_kind, char* filter_string);
 
 /** 
  * Retrieve the provider list.
@@ -365,9 +377,9 @@ int TSP_consumer_read_sample(TSP_provider_t provider,
 			     int* new_sample);
 
 
-int TSP_consumer_async_sample_write(TSP_provider_t provider,TSP_consumer_async_sample_t* async_sample_write);
+int TSP_consumer_request_async_sample_write(TSP_provider_t provider,TSP_consumer_async_sample_t* async_sample_write);
 
-int TSP_consumer_async_sample_read(TSP_provider_t provider,TSP_consumer_async_sample_t* async_sample_read);
+int TSP_consumer_request_async_sample_read(TSP_provider_t provider,TSP_consumer_async_sample_t* async_sample_read);
 
 
 

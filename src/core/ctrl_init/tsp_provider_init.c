@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/core/ctrl_init/tsp_provider_init.c,v 1.11.2.2 2005/09/18 16:51:12 erk Exp $
+$Header: /sources/tsp/tsp/src/core/ctrl_init/tsp_provider_init.c,v 1.11.2.3 2005/10/09 22:35:58 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -35,6 +35,7 @@ Purpose   : Function calls to launch a TSP Provider program
 
 -----------------------------------------------------------------------
  */
+#include <string.h>
 
 #include "tsp_sys_headers.h"
 

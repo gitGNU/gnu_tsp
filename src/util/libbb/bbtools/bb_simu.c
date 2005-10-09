@@ -50,7 +50,7 @@ main (int argc, char ** argv) {
   S_BB_T* mybb;
   mytype_t* myvar;
   char*     astring;
-  char      c_opt;
+  /* char      c_opt; */
 
   /*
    * Analyse options de lancement

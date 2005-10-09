@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/core/rpc/tsp_rpc.x,v 1.17.4.1 2005/09/28 17:01:35 erk Exp $
+$Header: /sources/tsp/tsp/src/core/rpc/tsp_rpc.x,v 1.17.4.2 2005/10/09 22:35:58 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -277,8 +277,11 @@ program TSP_RPC {
 	
 	void				TSP_EXEC_FEATURE(TSP_exec_feature_t exec_feature) = 109;
 	
-	int 				TSP_ASYNC_SAMPLE_WRITE(TSP_async_sample_t async_sample_write) = 110;
-	TSP_async_sample_t              TSP_ASYNC_SAMPLE_READ(TSP_async_sample_t async_sample_read) = 111;
+	int 				TSP_REQUEST_ASYNC_SAMPLE_WRITE(TSP_async_sample_t async_sample_write) = 110;
+
+	TSP_async_sample_t              TSP_REQUEST_ASYNC_SAMPLE_READ(TSP_async_sample_t async_sample_read) = 111;
+
+	TSP_answer_sample_t		TSP_REQUEST_FILTERED_INFORMATION(TSP_request_information_t req_info, int filter_kind, string filter_string<>) = 114;
 	
 
 	} = 1;

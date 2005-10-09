@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Id: generic_consumer.c,v 1.1.2.1 2005/10/04 16:52:42 erk Exp $
+$Id: generic_consumer.c,v 1.1.2.2 2005/10/09 22:35:58 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -348,7 +348,7 @@ generic_consumer_async_read(generic_consumer_request_t* req) {
   async_sample.provider_global_index = atoi(req->argv[1]);
   async_sample.value_ptr  = &value;
   async_sample.value_size = sizeof(value);
-  TSP_consumer_async_sample_read(req->the_provider,&async_sample);
+  retval = TSP_consumer_request_async_sample_read(req->the_provider,&async_sample);
   
   if (req->verbose) {
     generic_consumer_logMsg(req->stream,
@@ -392,6 +392,6 @@ generic_consumer_async_write(generic_consumer_request_t* req) {
 			    req->provider_url);
   }		       
 
-  TSP_consumer_async_sample_write(req->the_provider,&async_sample);
+  retval = TSP_consumer_request_async_sample_write(req->the_provider,&async_sample);
   return retval;
 }  /* end of generic_consumer_async_write */

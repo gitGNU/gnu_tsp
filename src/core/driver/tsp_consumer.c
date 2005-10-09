@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Header: /sources/tsp/tsp/src/core/driver/tsp_consumer.c,v 1.32.2.2 2005/09/28 17:01:35 erk Exp $
+$Header: /sources/tsp/tsp/src/core/driver/tsp_consumer.c,v 1.32.2.3 2005/10/09 22:35:58 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -761,7 +761,6 @@ int TSP_consumer_request_close(TSP_provider_t provider)
 }
 
 
-
 int TSP_consumer_request_information(TSP_provider_t provider)
 {
 	
@@ -837,6 +836,96 @@ int TSP_consumer_request_information(TSP_provider_t provider)
 	      TSP_CHECK_ALLOC(otsp->information.symbols.val[i].name, FALSE);			
 	    }
         }
+    }
+  else
+    {
+      STRACE_ERROR(("Unable to communicate with the provider"));
+
+    }
+		
+	
+  STRACE_IO(("-->OUT"));
+
+	
+  return ret;
+	
+}
+
+int TSP_consumer_request_filtered_information(TSP_provider_t provider, int filter_kind, char* filter_string)
+{
+	
+  TSP_otsp_t* otsp = (TSP_otsp_t*)provider;
+  TSP_request_information_t req_info;
+  TSP_answer_sample_t* ans_sample = 0;
+  int ret = FALSE;
+	
+  STRACE_IO(("-->IN"));
+
+	
+  TSP_CHECK_SESSION(otsp, FALSE);
+
+  /* Delete allocation of any previous call */
+  TSP_consumer_delete_information(otsp);
+	
+  req_info.version_id = TSP_VERSION;
+  req_info.channel_id = otsp->channel_id;
+	
+  /* Ask the provider for informations */
+  ans_sample = TSP_request_filtered_information(&req_info, filter_kind, filter_string, otsp->server);
+    
+  if( NULL != ans_sample)
+    {
+      
+      switch (ans_sample->status)
+	{
+	case TSP_STATUS_OK :
+	  ret = TRUE;
+	  break;
+	case TSP_STATUS_ERROR_UNKNOWN :
+	  STRACE_WARNING(("Provider unknown error"));
+	  break;
+	case TSP_STATUS_ERROR_VERSION :
+	  STRACE_WARNING(("Provider version error"));
+	  break;
+	default:
+	  STRACE_ERROR(("The provider sent an unreferenced error. It looks like a bug."));
+	  break;
+	}
+    }
+
+  /* Save all thoses sample data in memory */
+  if( TRUE == ret )
+    {
+      unsigned int symbols_number =
+	ans_sample->symbols.TSP_sample_symbol_info_list_t_len;
+      /*      unsigned int i; */
+	
+      otsp->information.base_frequency = ans_sample->base_frequency;
+      otsp->information.max_period = ans_sample->max_period;
+      otsp->information.max_client_number = ans_sample->max_client_number;
+      otsp->information.current_client_number = ans_sample->current_client_number;
+			
+      STRACE_DEBUG(("Total number of symbols found = %d",symbols_number));
+      STRACE_INFO(("Provider base frequency = %f Hz", ans_sample->base_frequency));
+
+      /* allocate memory to store those symbols */
+      /* FIXME  do it properly */
+/*       otsp->information.symbols.len = symbols_number; */
+/*       if(symbols_number > 0) */
+/* 	{ */
+/* 	  otsp->information.symbols.val =  */
+/* 	    (TSP_consumer_symbol_info_t* )calloc(symbols_number,sizeof(TSP_consumer_symbol_info_t)); */
+/* 	  TSP_CHECK_ALLOC(otsp->information.symbols.val, FALSE); */
+		
+/* 	  for(i = 0 ; i< symbols_number ; i++) */
+/* 	    {		 */
+/* 	      otsp->information.symbols.val[i].index = */
+/* 		ans_sample->symbols.TSP_sample_symbol_info_list_t_val[i].provider_global_index; */
+/* 	      otsp->information.symbols.val[i].name = */
+/* 		strdup(ans_sample->symbols.TSP_sample_symbol_info_list_t_val[i].name);				 */
+/* 	      TSP_CHECK_ALLOC(otsp->information.symbols.val[i].name, FALSE);			 */
+/* 	    } */
+/*         } */
     }
   else
     {
@@ -1248,7 +1337,7 @@ TSP_groups_t TSP_test_get_groups(TSP_provider_t provider)
 }
 
 
-int TSP_consumer_async_sample_write(TSP_provider_t provider,TSP_consumer_async_sample_t* async_sample_write)
+int TSP_consumer_request_async_sample_write(TSP_provider_t provider,TSP_consumer_async_sample_t* async_sample_write)
 {
  
   TSP_async_sample_t async_write;
@@ -1263,23 +1352,16 @@ int TSP_consumer_async_sample_write(TSP_provider_t provider,TSP_consumer_async_s
   
   /* verification of the structure*/
   	
-     STRACE_DEBUG(("TSP_CONSUMER Before TspWrite : pgi %d value %f return %d",
-     async_write.provider_global_index,
-     async_write.data.data_val,ret));	
-
   if(0 != otsp)
     {
     
-      ret = TSP_async_sample_write(&async_write,otsp->server);
+      ret = TSP_request_async_sample_write(&async_write,otsp->server);
       
     }
   else
     {
       STRACE_ERROR(("This provider is not instanciate"));
     }
-     STRACE_DEBUG(("TSP_CONSUMER After Tspwrite : pgi %d value %f return %d",
-     async_write.provider_global_index,
-     async_write.data.data_val,ret));
      
   STRACE_IO(("-->OUT"));
 	
@@ -1287,7 +1369,7 @@ int TSP_consumer_async_sample_write(TSP_provider_t provider,TSP_consumer_async_s
 	
 }
 
-int TSP_consumer_async_sample_read(TSP_provider_t provider,TSP_consumer_async_sample_t* async_sample_read)
+int TSP_consumer_request_async_sample_read(TSP_provider_t provider,TSP_consumer_async_sample_t* async_sample_read)
 {
  
   TSP_async_sample_t async_read;
@@ -1302,23 +1384,16 @@ int TSP_consumer_async_sample_read(TSP_provider_t provider,TSP_consumer_async_sa
   
   /* verification of the structure*/
   	
-     STRACE_DEBUG(("TSP_CONSUMER Before TspRead : pgi %d value %f return %d",
-     async_read.provider_global_index,
-     async_read.data.data_val,ret));	
-
   if(0 != otsp)
     {
     
-      ret = TSP_async_sample_read(&async_read,otsp->server);
+      ret = TSP_request_async_sample_read(&async_read,otsp->server);
       
     }
   else
     {
       STRACE_ERROR(("This provider is not instanciate"));
     }
-     STRACE_DEBUG(("TSP_CONSUMER After TspRead : pgi %d value %f return %d",
-     async_read.provider_global_index,
-     async_read.data.data_val,ret));
      
   STRACE_IO(("-->OUT"));
 	

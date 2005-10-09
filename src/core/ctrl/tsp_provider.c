@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Id: tsp_provider.c,v 1.25.4.3 2005/09/28 17:01:35 erk Exp $
+$Id: tsp_provider.c,v 1.25.4.4 2005/10/09 22:35:58 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -367,7 +367,7 @@ void  TSP_provider_request_information(TSP_request_information_t* req_info,
   if(req_info->version_id <= TSP_VERSION)
     {
       
-      ret = TSP_session_get_sample_symbol_info_list_by_channel(req_info->channel_id,						     &(ans_sample->symbols));
+      ret = TSP_session_get_sample_symbol_info_list_by_channel(req_info->channel_id,&(ans_sample->symbols));
       if(ret)
 	{
 	  ans_sample->status = TSP_STATUS_OK;
@@ -388,6 +388,49 @@ void  TSP_provider_request_information(TSP_request_information_t* req_info,
 
   TSP_UNLOCK_MUTEX(&X_tsp_request_mutex,);
 } /* End of TSP_provider_request_information */
+
+void  TSP_provider_request_filtered_information(TSP_request_information_t* req_info, 
+						int filter_kind, char* filter_string,
+						TSP_answer_sample_t* ans_sample)
+{
+  int ret;
+  TSP_LOCK_MUTEX(&X_tsp_request_mutex,);  
+  
+  ans_sample->version_id = TSP_VERSION;
+  ans_sample->channel_id = req_info->channel_id;
+  ans_sample->status = TSP_STATUS_ERROR_UNKNOWN;
+  ans_sample->provider_group_number = 0;
+  ans_sample->base_frequency = firstGLU->get_base_frequency(firstGLU);
+  ans_sample->max_client_number = TSP_MAX_CLIENT_NUMBER;
+  ans_sample->current_client_number = TSP_session_get_nb_session();
+  ans_sample->max_period = TSP_MAX_PERIOD;
+  ans_sample->symbols.TSP_sample_symbol_info_list_t_len = 0;
+  ans_sample->symbols.TSP_sample_symbol_info_list_t_val = 0;  
+  
+  if(req_info->version_id <= TSP_VERSION)
+    {
+      
+      ret = TSP_session_get_sample_symbol_info_list_by_channel(req_info->channel_id,&(ans_sample->symbols));
+      if(ret)
+	{
+	  ans_sample->status = TSP_STATUS_OK;
+	}
+      else
+	{
+	  STRACE_ERROR(("Function TSP_session_get_sample_symbol_info_list_by_channel failed"));
+	}
+    
+  }
+  else
+  {
+    STRACE_ERROR(("TSP version ERROR. Requested=%d Current=%d",req_info->version_id, TSP_VERSION ));
+    ans_sample->status = TSP_STATUS_ERROR_VERSION;
+  }
+  		
+  STRACE_IO(("-->OUT"));
+
+  TSP_UNLOCK_MUTEX(&X_tsp_request_mutex,);
+} /* End of TSP_provider_request_filtered_information */
 
 
 void TSP_provider_request_sample_free_call(TSP_answer_sample_t* ans_sample)
@@ -589,18 +632,18 @@ int TSP_provider_private_init(GLU_handle_t* theGLU, int* argc, char** argv[])
 } /* End of TSP_provider_private_init */
 
 
-int TSP_provider_async_sample_write(TSP_async_sample_t* async_sample_write)
+int TSP_provider_request_async_sample_write(TSP_async_sample_t* async_sample_write)
 {
   int ret = TRUE;
   STRACE_IO(("-->IN"));
 
-  STRACE_DEBUG(("TSP_PROVIDER Before TspWrite: pgi %d value %s return %d ",async_sample_write->provider_global_index,async_sample_write->data.data_val,ret ));
+  STRACE_DEBUG(("TSP_PROVIDER Before async_write: pgi %d value %s return %d ",async_sample_write->provider_global_index,async_sample_write->data.data_val,ret ));
   
   ret = firstGLU->async_write(firstGLU,
 			      async_sample_write->provider_global_index,
   			      async_sample_write->data.data_val,async_sample_write->data.data_len);
 
-  STRACE_DEBUG(("TSP_PROVIDER After TspWrite: pgi %d value %s return %d ",async_sample_write->provider_global_index,async_sample_write->data.data_val,ret ));
+  STRACE_DEBUG(("TSP_PROVIDER After async_write: pgi %d value %s return %d ",async_sample_write->provider_global_index,async_sample_write->data.data_val,ret ));
   
   STRACE_IO(("-->OUT"));
   return ret;
@@ -608,18 +651,19 @@ int TSP_provider_async_sample_write(TSP_async_sample_t* async_sample_write)
 } /* End of TSP_async_sample_write */
 
 
-int TSP_provider_async_sample_read(TSP_async_sample_t* async_sample_read)
+int TSP_provider_request_async_sample_read(TSP_async_sample_t* async_sample_read)
 {
   int ret = TRUE;
   STRACE_IO(("-->IN"));
 
-  STRACE_DEBUG(("TSP_PROVIDER Before TspWrite: pgi %d value %s return %d ",async_sample_read->provider_global_index,async_sample_read->data.data_val,ret ));
+  STRACE_DEBUG(("TSP_PROVIDER Before async_read: pgi %d value %s return %d ",async_sample_read->provider_global_index,async_sample_read->data.data_val,ret ));
   
   ret = firstGLU->async_read(firstGLU,
 			     async_sample_read->provider_global_index,
-			     async_sample_read->data.data_val,async_sample_read->data.data_len);
+			     (async_sample_read->data.data_val),
+			     &(async_sample_read->data.data_len));
 
-  STRACE_DEBUG(("TSP_PROVIDER After TspWrite: pgi %d value %s return %d ",async_sample_read->provider_global_index,async_sample_read->data.data_val,ret ));
+  STRACE_DEBUG(("TSP_PROVIDER After async_read: pgi %d value %s return %d ",async_sample_read->provider_global_index,async_sample_read->data.data_val,ret ));
   
   STRACE_IO(("-->OUT"));
   return ret;

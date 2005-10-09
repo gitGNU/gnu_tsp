@@ -1,6 +1,6 @@
 /*!  \file 
 
-$Id: tsp_provider.h,v 1.12.4.3 2005/09/28 17:01:35 erk Exp $
+$Id: tsp_provider.h,v 1.12.4.4 2005/10/09 22:35:58 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -68,7 +68,11 @@ void TSP_provider_request_open(const TSP_request_open_t* req_open,
 void TSP_provider_request_close(const TSP_request_close_t* req_close);
 
 void  TSP_provider_request_information(TSP_request_information_t* req_info, 
- 			      TSP_answer_sample_t* ans_sample);
+				       TSP_answer_sample_t* ans_sample);
+
+void  TSP_provider_request_filtered_information(TSP_request_information_t* req_info, 
+						int filter_kind, char* filter_string,
+						TSP_answer_sample_t* ans_sample);
 
 void  TSP_provider_request_sample(TSP_request_sample_t* req_sample, 
 			 TSP_answer_sample_t* ans_sample);
@@ -85,9 +89,9 @@ int TSP_provider_is_initialized(void);
 int TSP_provider_get_server_number(void);
 int TSP_provider_get_server_base_number(void );
 
-int TSP_provider_async_sample_write(TSP_async_sample_t* async_sample_write);
+int TSP_provider_request_async_sample_write(TSP_async_sample_t* async_sample_write);
 
-int TSP_provider_async_sample_read(TSP_async_sample_t* async_sample_read);
+int TSP_provider_request_async_sample_read(TSP_async_sample_t* async_sample_read);
 
 
 /** @} end group Provider */ 

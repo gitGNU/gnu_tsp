@@ -1,6 +1,6 @@
-/*!  \file 
+/*
 
-$Header: /sources/tsp/tsp/src/core/xmlrpc/Attic/tsp_xmlrpc_client.c,v 1.2 2005/11/29 19:13:09 erk Exp $
+$Header: /sources/tsp/tsp/src/core/xmlrpc/Attic/tsp_xmlrpc_client.c,v 1.3 2006/02/07 21:10:41 deweerdt Exp $
 
 -----------------------------------------------------------------------
 

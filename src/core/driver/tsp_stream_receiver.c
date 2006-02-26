@@ -1,6 +1,6 @@
-/*!  \file 
+/*
 
-$Header: /sources/tsp/tsp/src/core/driver/tsp_stream_receiver.c,v 1.10 2005/10/09 23:01:24 erk Exp $
+$Header: /sources/tsp/tsp/src/core/driver/tsp_stream_receiver.c,v 1.11 2006/02/26 13:36:05 erk Exp $
 
 -----------------------------------------------------------------------
 

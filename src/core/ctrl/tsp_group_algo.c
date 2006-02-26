@@ -1,6 +1,6 @@
-/*!  \file 
+/*
 
-$Header: /sources/tsp/tsp/src/core/ctrl/tsp_group_algo.c,v 1.14 2006/02/03 20:46:22 erk Exp $
+$Header: /sources/tsp/tsp/src/core/ctrl/tsp_group_algo.c,v 1.15 2006/02/26 13:36:05 erk Exp $
 
 -----------------------------------------------------------------------
 

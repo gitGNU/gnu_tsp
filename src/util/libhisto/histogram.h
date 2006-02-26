@@ -1,6 +1,6 @@
-/*!  \file 
+/*
 
-$Header: /sources/tsp/tsp/src/util/libhisto/histogram.h,v 1.1 2004/04/09 15:52:04 dufy Exp $
+$Header: /sources/tsp/tsp/src/util/libhisto/histogram.h,v 1.2 2006/02/26 13:36:06 erk Exp $
 
 -----------------------------------------------------------------------
 

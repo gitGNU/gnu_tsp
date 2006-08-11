@@ -1,6 +1,6 @@
 /*
 
-$Header: /sources/tsp/tsp/src/util/libbb/bb_module.c,v 1.1.2.1 2006/08/11 09:31:41 deweerdt Exp $
+$Header: /sources/tsp/tsp/src/util/libbb/bb_module.c,v 1.1.2.2 2006/08/11 14:36:28 deweerdt Exp $
 
 -----------------------------------------------------------------------
 
@@ -54,17 +54,19 @@ Purpose   : Blackboard kernel module
 #include <linux/delay.h>
 #include <linux/device.h>
 #include <linux/cdev.h>
+#include <linux/moduleparam.h>
 
 #include "bb_core.h"
 #include "bb_core_k.h"
 #include "bb_simple.h"
 
+static int run_test = 1;
+module_param(run_test, int, 0);
+
 static struct class *bb_dev_class;
 static dev_t bb_devt;
 int bb_major;
 int bb_minor = 0;
-
-static unsigned long shmem_size = PAGE_SIZE;
 
 static int bb_open(struct inode *inode, struct file *filp)
 {
@@ -87,26 +89,19 @@ static int bb_ioctl(struct inode *i, struct file *filp,
 		       unsigned int cmd, unsigned long arg)
 {
 	int ret = 0;
+	struct bb_device *dev; 
+
+	dev = container_of(i->i_cdev, struct bb_device, cdev);
 
 	switch (cmd) {
 	case BBKGETSIZE:
-		if (copy_to_user ((int *) arg, &shmem_size, sizeof(shmem_size)))
+		if (copy_to_user ((int *) arg, &dev->bb->priv.k.shm_size, sizeof(dev->bb->priv.k.shm_size)))
 			ret = -EFAULT;
 		break;
 	case BBKSETSIZE:
-		if (copy_from_user (&shmem_size, (int *) arg, sizeof(shmem_size)))
+		if (copy_from_user (&dev->bb->priv.k.shm_size, (int *) arg, sizeof(dev->bb->priv.k.shm_size)))
 			ret = -EFAULT;
 		break;
-#if 0
-	case BBKGET:
-		if (copy_from_user (&shmem_size, (int *) arg, sizeof(shmem_size)))
-			ret = -EFAULT;
-		break;
-	case BBKCREATE:
-		if (copy_from_user (&shmem_size, (int *) arg, sizeof(shmem_size)))
-			ret = -EFAULT;
-		break;
-#endif
 	default:
 		ret = -EINVAL;
 	}
@@ -149,15 +144,15 @@ static int bb_mmap(struct file *filp, struct vm_area_struct *vma)
 	bb = dev->bb;
 	/* sanity check, assert that the user doesn't request more
 	 * than available */
-
 	if (vsize > bb->priv.k.shm_size)
 		return -EINVAL;
+
 	/* No offset allowed */
 	if (vma->vm_pgoff != 0)
 		return -EINVAL;
 
 	/* In theory, this could be writeable, at least for root */
-	/* Disable it for now, as it needs testing */
+	/* Disable it for now, as this needs testing */
         if (vma->vm_flags & VM_WRITE)
 		return -EPERM;
 
@@ -202,7 +197,10 @@ static int __init bb_init_module(void)
 	}
 
 	bitmap_zero(present_devices, BB_DEV_MAX);
-	test_thread = kthread_run(bb_test, NULL, "bb_test");
+	
+	/* This is here for demo purposes, activate with the param */
+	if (run_test)
+		test_thread = kthread_run(bb_test, NULL, "bb_test");
 
 	printk("Kernel black board loaded.\n");
 	printk("See http://savannah.nongnu.org/projects/tsp for details.\n");
@@ -216,7 +214,9 @@ err_destroy_class:
 
 static void __exit bb_cleanup_module(void)
 {
-	kthread_stop(test_thread);
+	if (run_test)
+		kthread_stop(test_thread);
+
 	spin_lock(&pdeviceslock);
 	while(!bitmap_empty(present_devices, BB_DEV_MAX)) {
 		int i = find_first_bit(present_devices, BB_DEV_MAX);

@@ -1,6 +1,6 @@
 /*
 
-$Header: /sources/tsp/tsp/src/util/libbb/bb_module.c,v 1.1.2.2 2006/08/11 14:36:28 deweerdt Exp $
+$Header: /sources/tsp/tsp/src/util/libbb/bb_module.c,v 1.1.2.3 2006/08/11 22:51:24 deweerdt Exp $
 
 -----------------------------------------------------------------------
 
@@ -144,12 +144,17 @@ static int bb_mmap(struct file *filp, struct vm_area_struct *vma)
 	bb = dev->bb;
 	/* sanity check, assert that the user doesn't request more
 	 * than available */
-	if (vsize > bb->priv.k.shm_size)
+	if (vsize > (bb->priv.k.shm_size + 2 * PAGE_SIZE)) {
+		printk("mmap requested more than available: %lu > %lu\n", 
+			vsize, bb->priv.k.shm_size + 2 * PAGE_SIZE);
 		return -EINVAL;
+	}
 
 	/* No offset allowed */
-	if (vma->vm_pgoff != 0)
+	if (vma->vm_pgoff != 0) {
+		printk("bb->mmap doesn't support offsets\n");
 		return -EINVAL;
+	}
 
 	/* In theory, this could be writeable, at least for root */
 	/* Disable it for now, as this needs testing */

@@ -1,6 +1,6 @@
 /*
 
-$Header: /sources/tsp/tsp/src/util/libbb/bb_core_k.c,v 1.1.2.3 2006/08/11 22:30:27 deweerdt Exp $
+$Header: /sources/tsp/tsp/src/util/libbb/bb_core_k.c,v 1.1.2.4 2006/08/11 22:50:20 deweerdt Exp $
 
 -----------------------------------------------------------------------
 
@@ -114,16 +114,29 @@ static int k_bb_shmem_attach(S_BB_T ** bb, const char *name)
 static int k_bb_shmem_attach(S_BB_T ** bb, const char *name)
 {
 	int fd;
+	int shm_size;
+
         fd = open(name, O_RDWR | O_SYNC);
         if( fd == -1) {
 		return BB_NOK;
         }
 
-        *bb = mmap(0, 1024, PROT_READ, MAP_FILE | MAP_SHARED, fd, 0);
+	/* At first, only map the BB structure ... */
+        *bb = mmap(0, sizeof(S_BB_T), PROT_READ, MAP_FILE | MAP_SHARED, fd, 0);
         if(*bb == MAP_FAILED) {
 		close(fd);
 		return BB_NOK;
         }
+	shm_size = (*bb)->priv.k.shm_size;
+	munmap(*bb, sizeof(S_BB_T));
+
+	/* ... then remap with the size of the BB + _data_ */
+        *bb = mmap(0, shm_size, PROT_READ, MAP_FILE | MAP_SHARED, fd, 0);
+        if(*bb == MAP_FAILED) {
+		close(fd);
+		return BB_NOK;
+        }
+
 	return BB_OK;
 }
 #endif /* __KERNEL__ */

@@ -1,6 +1,6 @@
 /*
 
-$Header: /sources/tsp/tsp/src/util/libbb/bb_simple.c,v 1.9 2006/07/22 16:57:16 deweerdt Exp $
+$Header: /sources/tsp/tsp/src/util/libbb/bb_simple.c,v 1.9.2.1 2006/08/11 08:49:47 deweerdt Exp $
 
 -----------------------------------------------------------------------
 
@@ -34,9 +34,11 @@ Purpose   : BlackBoard Idiom implementation
 
 -----------------------------------------------------------------------
  */
+#ifndef __KERNEL__
 #include <sys/types.h>
 #include <sys/msg.h>
 #include <string.h>
+#endif /* __KERNEL__ */
 
 #include "bb_utils.h"
 #include "bb_core.h"
@@ -45,10 +47,12 @@ Purpose   : BlackBoard Idiom implementation
 
 static int bb_simple_synchro_type = BB_SIMPLE_SYNCHRO_PROCESS;
 
+#ifndef __KERNEL__
 pthread_cond_t  bb_simple_go_condvar       = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t bb_simple_go_mutex         = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t  bb_simple_stockage_condvar = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t bb_simple_stcokage_mutex   = PTHREAD_MUTEX_INITIALIZER;
+#endif
 
 void* bb_simple_publish(S_BB_T* bb_simple,
 			const char* var_name, 
@@ -208,7 +212,7 @@ bb_simple_synchro_config(int synchro_type) {
   return retcode;
 } /* end of bb_simple_synchro_config */
 
-int32_t
+int32_t 
 bb_simple_synchro_go(S_BB_T* bb_simple,int type_msg) {
   
   int32_t retcode;
@@ -256,6 +260,13 @@ bb_simple_synchro_verify(S_BB_T* bb_simple) {
   return bb_msgq_isalive(bb_simple);
 } /* end of bb_simple_synchro_verify */
 
+#ifdef __KERNEL__
+int32_t 
+bb_simple_thread_synchro_go(int msg_type) 
+{
+	return BB_OK;
+}
+#else
  int32_t 
 bb_simple_thread_synchro_go(int msg_type) {
   
@@ -281,7 +292,15 @@ bb_simple_thread_synchro_go(int msg_type) {
   
   return retcode;
 } /* end of bb_simple_synchro_go */
+#endif /* __KERNEL__ */
 
+#ifdef __KERNEL__
+int32_t 
+bb_simple_thread_synchro_wait(int msg_type) 
+{
+	return BB_OK;
+}
+#else
 int32_t 
 bb_simple_thread_synchro_wait(int msg_type) {
   
@@ -307,4 +326,8 @@ bb_simple_thread_synchro_wait(int msg_type) {
   
   return retcode;
 } /* end of bb_simple_synchro_wait */
+#endif /* __KERNEL__ */
 
+#ifdef __KERNEL__
+EXPORT_SYMBOL_GPL(bb_simple_publish);
+#endif

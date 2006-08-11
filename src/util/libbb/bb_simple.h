@@ -1,6 +1,6 @@
 /*
 
-$Header: /sources/tsp/tsp/src/util/libbb/bb_simple.h,v 1.8 2006/07/22 16:57:38 deweerdt Exp $
+$Header: /sources/tsp/tsp/src/util/libbb/bb_simple.h,v 1.8.2.1 2006/08/11 08:49:47 deweerdt Exp $
 
 -----------------------------------------------------------------------
 
@@ -37,6 +37,28 @@ Purpose   : BlackBoard Idiom implementation
 #ifndef _BB_SIMPLE_H_
 #define _BB_SIMPLE_H_
 
+#ifdef __KERNEL__
+
+#include <linux/module.h>
+#include <linux/init.h>
+#include <linux/version.h>
+#include <linux/errno.h>
+#include <linux/fs.h>
+#include <linux/mm.h>
+#include <linux/interrupt.h>
+#include <linux/sched.h>
+#include <asm/uaccess.h>
+#include <asm/io.h>
+#include <linux/vmalloc.h>
+#include <linux/mman.h>
+#include <linux/slab.h>
+#include <linux/highmem.h>
+#include <linux/types.h>
+
+
+
+#else
+
 #include <stdio.h>
 #include <pthread.h>
 #include "bb_utils.h"
@@ -46,6 +68,8 @@ pthread_cond_t  bb_simple_go_condvar;
 pthread_mutex_t bb_simple_go_mutex;
 pthread_cond_t  bb_simple_stockage_condvar;
 pthread_mutex_t bb_simple_stockage_mutex;
+
+#endif /* __KERNEL__ */
 
 #define BB_SIMPLE_SYNCHRO_THREAD  1
 #define BB_SIMPLE_SYNCHRO_PROCESS 2
@@ -81,7 +105,9 @@ pthread_mutex_t bb_simple_stockage_mutex;
  * @{
  */
 
+#ifndef __KERNEL__
 BEGIN_C_DECLS
+#endif
 
 /**
  * Publish data in a simple BB.
@@ -232,6 +258,8 @@ void* bb_simple_alias_publish(S_BB_T* bb_simple,
 
 /** @} */
 
+#ifndef __KERNEL__
 END_C_DECLS
+#endif
 
 #endif /* _BB_SIMPLE_H_ */

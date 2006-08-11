@@ -1,6 +1,6 @@
 /*
 
-$Header: /sources/tsp/tsp/src/util/libbb/bb_utils.c,v 1.12 2006/07/22 16:58:39 deweerdt Exp $
+$Header: /sources/tsp/tsp/src/util/libbb/bb_utils.c,v 1.12.2.1 2006/08/11 08:49:47 deweerdt Exp $
 
 -----------------------------------------------------------------------
 

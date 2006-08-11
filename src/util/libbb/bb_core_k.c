@@ -1,6 +1,6 @@
 /*
 
-$Header: /sources/tsp/tsp/src/util/libbb/bb_core_k.c,v 1.1.2.2 2006/08/11 22:27:45 deweerdt Exp $
+$Header: /sources/tsp/tsp/src/util/libbb/bb_core_k.c,v 1.1.2.3 2006/08/11 22:30:27 deweerdt Exp $
 
 -----------------------------------------------------------------------
 
@@ -70,14 +70,16 @@ Purpose   : Blackboard In-Kernel user and kernel space implementation
 
 /* dummy declaration, see the bottom of the file */
 struct bb_operations k_bb_ops;
+#ifdef __KERNEL__
 /* Array holding the used BBs, this is usefull
  * at unload time, where we want to clean up every
  * in-use bb before leaving */
-static S_BB_T *present_bbs[BB_DEV_MAX];
+S_BB_T *present_bbs[BB_DEV_MAX];
 /* Tracks the used/unused BBs */
-static DECLARE_BITMAP(present_devices, BB_DEV_MAX);
+DECLARE_BITMAP(present_devices, BB_DEV_MAX);
 /* protects access to the two bb tracking tools above */
-static DEFINE_SPINLOCK(pdeviceslock);
+DEFINE_SPINLOCK(pdeviceslock);
+#endif /* __KERNEL__ */
 
 
 static int k_bb_msgq_get(S_BB_T * bb, int create)

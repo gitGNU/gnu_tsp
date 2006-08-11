@@ -1,3 +1,40 @@
+/*
+
+$Header: /sources/tsp/tsp/src/util/libbb/bb_core_k.c,v 1.1.2.2 2006/08/11 22:27:45 deweerdt Exp $
+
+-----------------------------------------------------------------------
+
+TSP Library - core components for a generic Transport Sampling Protocol.
+
+Copyright (c) 2006 Frederik DEWEERDT
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+-----------------------------------------------------------------------
+
+Project   : TSP
+Maintainer : tsp@astrium-space.com
+Component : Consumer
+
+-----------------------------------------------------------------------
+
+Purpose   : Blackboard In-Kernel user and kernel space implementation
+
+-----------------------------------------------------------------------
+ */
+
 #ifdef __KERNEL__
 
 #include <linux/module.h>
@@ -27,14 +64,21 @@
 
 #endif /* __KERNEL__ */
 
-
 #include "bb_core.h"
 #include "bb_core_k.h"
 #include "bb_utils.h"
 
-#define LOG(x, ...)
-
+/* dummy declaration, see the bottom of the file */
 struct bb_operations k_bb_ops;
+/* Array holding the used BBs, this is usefull
+ * at unload time, where we want to clean up every
+ * in-use bb before leaving */
+static S_BB_T *present_bbs[BB_DEV_MAX];
+/* Tracks the used/unused BBs */
+static DECLARE_BITMAP(present_devices, BB_DEV_MAX);
+/* protects access to the two bb tracking tools above */
+static DEFINE_SPINLOCK(pdeviceslock);
+
 
 static int k_bb_msgq_get(S_BB_T * bb, int create)
 {
@@ -70,14 +114,13 @@ static int k_bb_shmem_attach(S_BB_T ** bb, const char *name)
 	int fd;
         fd = open(name, O_RDWR | O_SYNC);
         if( fd == -1) {
-                printf("open error...\n");
-                exit(0);
+		return BB_NOK;
         }
 
         *bb = mmap(0, 1024, PROT_READ, MAP_FILE | MAP_SHARED, fd, 0);
         if(*bb == MAP_FAILED) {
-                printf("mmap() failed\n");
-                exit(1);
+		close(fd);
+		return BB_NOK;
         }
 	return BB_OK;
 }
@@ -94,7 +137,7 @@ static int allocate_bb(S_BB_T ** bb, const char *name, int n_data,
 	shm_size = bb_size(n_data, data_size) + PAGE_SIZE;
 	/* 
 	 * create the shared memory pool. we add two pages to get 
-	 * the desired amount of aligned memory on a PAGE boundary,
+	 * the desired amount of memory aligned on a PAGE boundary,
 	 * even in the worst case
 	 */
 	kmalloc_ptr = kmalloc(shm_size + 2 * PAGE_SIZE, GFP_ATOMIC);
@@ -134,15 +177,6 @@ static int allocate_bb(S_BB_T ** bb, const char *name, int n_data,
 	return BB_OK;
 }
 
-/* Array holding the used BBs, this is usefull
- * at unload time, where we want to clean up every
- * in-use bb before leaving */
-S_BB_T *present_bbs[BB_DEV_MAX];
-/* Tracks the used/unused BBs */
-DECLARE_BITMAP(present_devices, BB_DEV_MAX);
-/* protects access to the two bb tracking tools above */
-DEFINE_SPINLOCK(pdeviceslock);
-
 static int k_bb_shmem_get(S_BB_T ** bb, const char *name, int n_data,
 			     int data_size, int create)
 {
@@ -181,7 +215,7 @@ static int k_bb_shmem_get(S_BB_T ** bb, const char *name, int n_data,
 	if(err != 0) 
 		goto err_destroy_bb;
 	
-	printk("New bb device created major: %d, minor: %d\n",
+	printk("New bb device created, major: %d, minor: %d\n",
 				MAJOR(devno), MINOR(devno));
 	dev->bb = *bb;
 	(*bb)->priv.k.dev = dev;

@@ -1,6 +1,6 @@
 /*
 
-$Header: /sources/tsp/tsp/src/util/libres/dataw.c,v 1.4 2006/02/26 13:36:06 erk Exp $
+$Header: /sources/tsp/tsp/src/util/libres/dataw.c,v 1.5 2006/10/18 09:58:49 erk Exp $
 
 -----------------------------------------------------------------------
 
@@ -284,7 +284,7 @@ void	d_writ_r(d_whandle h, void *buf)
 
 
 
-void	d_clos(void)
+void	d_clos()
 {
 
   if(d_glob_rhandle)

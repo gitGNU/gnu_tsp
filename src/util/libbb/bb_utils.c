@@ -1,6 +1,6 @@
 /*
 
-$Header: /sources/tsp/tsp/src/util/libbb/bb_utils.c,v 1.12.2.1 2006/08/11 08:49:47 deweerdt Exp $
+$Header: /sources/tsp/tsp/src/util/libbb/bb_utils.c,v 1.12.2.2 2006/11/30 15:59:27 deweerdt Exp $
 
 -----------------------------------------------------------------------
 
@@ -34,6 +34,7 @@ Purpose   : Blackboard Idiom utilities
 
 -----------------------------------------------------------------------
  */
+#include <assert.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>

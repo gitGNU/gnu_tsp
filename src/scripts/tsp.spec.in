@@ -83,7 +83,7 @@ rm -rf build_tree
 %{prefix}/doc
 
 %changelog
-* Mon 1 dec 2008 ptitoliv <obonhomme@nerim.net>
+* Mon Dec 01 2008 ptitoliv <obonhomme@nerim.net>
   - Add tsp lib to /etc/ld.so.conf
   - This is repackagaging only version of 0.8.3 tsp sources are untouched.
 * Wed Jan 24 2007 Erk <eric.noulard@gmail.com>

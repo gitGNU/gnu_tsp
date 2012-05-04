@@ -301,7 +301,6 @@ static int tspfs_init_connect(int argc, char **argv, char *url)
 	for (i = 0; i < tspfs.symbols.TSP_sample_symbol_info_list_t_len; i++) {
 		ENTRY e;
 		ENTRY *ep;
-		int ret;
 
 		tspfs.symbols.TSP_sample_symbol_info_list_t_val[i] =
 		    tspfs.information->symbols.TSP_sample_symbol_info_list_t_val[i];
@@ -312,7 +311,7 @@ static int tspfs_init_connect(int argc, char **argv, char *url)
 
 		e.key = tspfs.symbols.TSP_sample_symbol_info_list_t_val[i].name;
 		e.data = (void *)i;
-		ret = hsearch_r(e, ENTER, &ep, &tspfs.name_to_index);
+		(void) hsearch_r(e, ENTER, &ep, &tspfs.name_to_index);
 	}
 
 	tspfs.nr_samples = tspfs.information->symbols.TSP_sample_symbol_info_list_t_len;
@@ -497,8 +496,6 @@ static int tspfs_read(const char *path, char *buf, size_t size,
 	idx = get_tsp_symbol_index(sym_name);
 	sample = get_tsp_symbol_value(idx);
 	if (tspfs.sync) {
-		char *format;
-		format = "";
 #ifdef TSPFS_DEBUG
 		fprintf(stderr,"Symbol is : %s type: %d pgi: %d, idx: %ld\n", sym_name, sample->sync.type, sample->sync.provider_global_index, idx);
 #endif

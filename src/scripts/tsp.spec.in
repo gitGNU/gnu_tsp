@@ -99,6 +99,10 @@ rm -rf build_tree
 %endif
 
 %changelog
+* Sun Apr 20 2014 Olivier Bonhomme <obonhomme@nerim.net>
+  - 0.8.4 Official Release
+  - Fix TSP Paths in the shell profiles
+
 * Sun Nov 11 2007 Robert de Vries <R.de.Vries@dutchspace.nl>
   - Move include files into separate package tsp-devel
   - Rename tsp-apidoc package to tsp-doc

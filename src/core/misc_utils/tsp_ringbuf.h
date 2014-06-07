@@ -99,7 +99,7 @@ BEGIN_C_DECLS
 */
 
 #define RINGBUF_DEFINE(TypeName, name, sz) \
-	TypeName	(name) = { sz, 0, 0, 0, 0 }
+	TypeName	(name) = { sz, 0, 0, 0, {0} }
 
 #define RINGBUF_PUT(name, item) \
 	{ \

@@ -1,3 +1,177 @@
+Olivier Bonhomme 2014-06-08 - tag TSP_0_8_4
+
+* David Moreau 2014-06-07 | Fixes sr #108525: gcc warning on RINGBUF_DEFINE (HEAD, br_TSP_0_8_4_x) 
+* Olivier BONHOMME 2014-04-20 | Update RPM changelog. (origin/br_TSP_0_8_4_x) 
+* Olivier BONHOMME 2014-04-20 | Remove the default initialization for the PACKAGE_VERSION_PATCH variable. 
+* Olivier BONHOMME 2014-04-20 | New variable CMAKE_REAL_INSTALL_PREFIX 
+* Eric Noulard 2012-05-04 | Avoid to put build dir in source archive if the build tree is inside the source tree (origin/origin, origin/master, origin/HEAD, master) 
+* Eric Noulard 2012-05-04 | Fix compilation issue wiht gcc4 
+* Eric Noulard 2012-05-04 | Avoid CMake warning about non-existent CMakeLists.txt 
+* Eric Noulard 2009-04-20 | Remove obsolete README.rpm 
+* Eric Noulard 2009-04-20 | Check-in patch from Frederic MARTINSONS patch #6812 This is a preliminary fix for bug #26250 
+* Eric Noulard 2009-04-20 | Enable FULL_RPATH usage through CMake the default remains the same: do not use it. 
+* Eric Noulard 2009-04-20 | Update with more appropriate values. 
+* Frederik Deweerdt 2008-11-22 | Fix path to windows help chm file 
+* Frederik Deweerdt 2008-11-22 | Update Windows Graphviz search PATH to the latest version 
+* Frederik Deweerdt 2008-11-22 | Add a commant to start the portmap service at the end of the Windows install 
+* Frederik Deweerdt 2008-11-22 | ONCRPC for Win32 doesn't provide xdr_hyper to encode 64bits Donc XDR encode if we're compiling for a WIN32 platform 
+* Frederik Deweerdt 2008-11-21 | Fix cmake ENDIF() ending to match corresponding IF() 
+* Eric Noulard 2008-11-12 | Merge in patch #6667 which fixes bug #24797 : Endian problem with ip adress ? 
+* Eric Noulard 2008-11-07 | Fix trouble with execute process command arguments 
+* Eric Noulard 2008-10-06 | Avoid to put BUILDNAME inside CMakeLists.txt 
+* Robert De Vries 2008-10-03 | splint barfs on __func__ redefinitions. 
+* Eric Noulard 2008-09-26 | Add CDash support see: http://www.cdash.org/CDashPublic/index.php?project=TSP 
+* Jérôme Arbez-Gindre 2008-09-04 | Take into account that CN_IDX_BB will be define in a 2.6.27 kernel include file (linux/connector.h) 
+* Frederik Deweerdt 2008-08-02 | Win32 build fixes 
+* Jérôme Arbez-Gindre 2008-07-25 | Allow easier deb/rpm generation if cmake version is greater than 2.4. 
+* Jérôme Arbez-Gindre 2008-07-24 | Resolve bug #23927. For bb_snd_msg and bb_rcv_msg: 	- Make Doxygen comment fit with behavior. 	- Replace return type int32_t by ssize_t (equivalent but closer to the send/receive semantic) 
+* Jérôme Arbez-Gindre 2008-07-24 | Update a dependecy rule. 
+* Jérôme Arbez-Gindre 2008-07-24 | Add the option ALLOW_KBB_WRITE_ACCESS_FROM_USERSPACE (default OFF) to allow writing in Kernel BBs from userspace (task #8391). 
+* Jérôme Arbez-Gindre 2008-07-24 | Handle the compialtion case of missing linux/connector.h 
+* Jérôme Arbez-Gindre 2008-07-23 | Implementation of messaging feature in kernel BB on top of Linux connectors (see in Linux sources Documentation/connector/connector.txt) 
+* Jérôme Arbez-Gindre 2008-07-21 | move "dev" from "struct kernel_private" (embedded in BB) to "struct S_BB_LOCAL". 
+* Jérôme Arbez-Gindre 2008-07-21 | move "kmalloc_ptr" from "struct kernel_private" (embedded in BB) to "struct S_BB_LOCAL". 
+* Jérôme Arbez-Gindre 2008-07-21 | Add a context in the calback interface. 
+* Jérôme Arbez-Gindre 2008-07-21 | Add a context in the calback interface. 
+* Jérôme Arbez-Gindre 2008-07-21 | Allow to use BB locals in create/destroy/attach/detach functions. 
+* Jérôme Arbez-Gindre 2008-07-21 | bb_rcv_msg return value can be compared with BB_NOK, but not with BB_OK. 
+* Jérôme Arbez-Gindre 2008-07-21 | Remove missing symbol error when compiling BB kernel module. 
+* Jérôme Arbez-Gindre 2008-07-21 | Remove compilation error when BUILD_POSIX_BB=ON 
+* Jérôme Arbez-Gindre 2008-07-18 | Correct handling of initilized values; pkg-config will work without -DPKGCONFIG_INSTALL_PREFIX=/usr in the cmake invocation 
+* Jérôme Arbez-Gindre 2008-07-18 | Handle local data attach to a BB. Add a "callback way" to the receiving message API. 
+* Robert De Vries 2008-07-11 | Fix crash when asking for more symbols than are provided. Do not only support doubles, support all types. 
+* Robert De Vries 2008-07-11 | Remove DOS CR line terminations here and there. 
+* Robert De Vries 2008-07-11 | Fix bug in printing 64 bit integers. Also substitute format specifiers directly in fprintf() calls so that the compiler gets a chance at checking them against the actual parameter. 
+* Jérôme Arbez-Gindre 2008-07-09 | Refine copyright notice. 
+* Jérôme Arbez-Gindre 2008-07-08 | Set forgotten compile/install module directory. 
+* Jérôme Arbez-Gindre 2008-07-08 | README/Copyright corrections. 
+* Jérôme Arbez-Gindre 2008-07-07 | Create class_devices to help the kernel to generate udev events with BB name. (task #8385) 
+* Jérôme Arbez-Gindre 2008-07-07 | Do not run test as default behavior. 
+* Jérôme Arbez-Gindre 2008-07-07 | bb_destroy have to exported. 
+* Eric Noulard 2008-07-03 | Add PACKAGE_VERSION_MORE in order to be able to mangle version name for continuous integration tools. Original idea from Jerome Arbez-Gindre. 
+* Frederik Deweerdt 2008-06-30 | Fix x86-64 related warnings 
+* Jérôme Arbez-Gindre 2008-06-30 | Add the ability to build the module-assistant debian package for the BB linux kernel module. 
+* Robert De Vries 2008-06-29 | Add -D_GNU_SOURCE flag to top-level CMakeLists.txt file for GNU C compiler only. Remove locally defined __USE_GNU and _GNU_SOURCE defines from tspfs.[ch] 
+* Jérôme Arbez-Gindre 2008-06-26 | Fix "Out of source build" of linux kernel BB module. (bug #23712) - Improve ADD_CUSTOM_COMMAND DEPENDS options - create a kbuid folder and copy in it every needed files... and then compile locally. 
+* Jérôme Arbez-Gindre 2008-06-26 | Fix compilation error on BB linux kernel module (bug #23711) Remomve also a linux kernel module compilation warning home/jerome/projects/tsp/src/util/libbb/bb_core.c:113: warning: 'posix_bb_ops' defined but not used 
+* Eric Noulard 2008-06-25 | Suppress DEBUG output 
+* Eric Noulard 2008-06-25 | Suppress buggy test (until we get a working test sets) 
+* Eric Noulard 2008-06-25 | Fix compilation error on x86_64 machine. Format for pointer is arch dependent... 
+* Eric Noulard 2008-06-25 | Fix compilation error on x86_64 machine. Format for pointer is arch dependant... 
+* Eric Noulard 2008-06-25 | Fix getFutureLastStep usage 
+* Eric Noulard 2008-06-25 | Fix compilation error on x86_64 machine. Format for pointer is arch dependant... 
+* Robert De Vries 2008-06-24 | As discussed in bug #22190 these files may be removed as they are not currently maintained and redundant. The client side is already covered by the normal rpc interface. 
+* Robert De Vries 2008-06-24 | Fix small compiler warnings from gcc 4.3.0 
+* Frederik Deweerdt 2008-05-02 | More 64bit warning fixes 
+* Eric Noulard 2008-04-27 | Fix some 32/64 bits issues. 
+* Eric Noulard 2008-04-25 | Small typos fix 
+* Eric Noulard 2008-04-24 | Small update 
+* Eric Noulard 2008-04-24 | First TSP dtest sequence 
+* Eric Noulard 2008-04-05 | Should fix bug #22731 : Too much memory consumption in socket buffer Socket buffer size should be appropriately sized 
+* Frederik Deweerdt 2008-04-01 | Remove obsolete "Generic" comment 
+* Frederik Deweerdt 2008-04-01 | Propagate return codes from "bb_<cmd>()" to "bb_tools <cmd>" executable 
+* Frederik Deweerdt 2008-04-01 | Rtems related fixes 
+* Frederik Deweerdt 2008-04-01 | Fix some comments 
+* Frederik Deweerdt 2008-04-01 | Fix coding style 
+* Frederik Deweerdt 2008-03-31 | Remove trailing withspace 
+* Frederik Deweerdt 2008-03-31 | Remove trailing whitespace 
+* Frederik Deweerdt 2008-03-31 | sys/ipc.h issue resolved: include bb_utils.c in libbb.a under rtems too 
+* Frederik Deweerdt 2008-03-31 | Remove unused sys/ipc.h header 
+* Frederik Deweerdt 2008-03-25 | Don't build shared libs in the Rtems case 
+* Frederik Deweerdt 2008-03-25 | Move disabling consumer building to main CMakeLists.txt 
+* Frederik Deweerdt 2008-03-25 | CMake no longer accepts $() variables, use ${} as intended 
+* Frederik Deweerdt 2008-03-24 | TSP Rtems port: mostly ifdef __rtems__ added 
+* Frederik Deweerdt 2008-03-24 | TSP Rtems port: add BUILD_RTEMS option 
+* Frederik Deweerdt 2008-03-24 | TSP Rtems port: cmake infrastructure 
+* Frederik Deweerdt 2008-03-24 | Rename rtems files, step 2 
+* Frederik Deweerdt 2008-03-24 | Rename rtems files, step 1 
+* Frederik Deweerdt 2008-03-16 | Merging Stéphane Arquer's work: First RTEMs port batch This just merely compiles, work needs to be done to add a real posix BB to the mainline 
+* Eric Noulard 2008-03-05 | Update the make patch target 
+* Eric Noulard 2008-03-05 | Add a cmake scripts for creating patch 
+* Frederik Deweerdt 2008-03-04 | Task #7824, add a "patch" target to generate a patch file 
+* Frederik Deweerdt 2008-02-24 | Bug fix (introduced by previous commit): take -s switch into account 
+* Frederik Deweerdt 2008-02-23 | * coding style clean-up * better option parsing * add -x to clean up the blackboard on exit 
+* Robert De Vries 2008-02-05 | Implement solution to allow redirection of trace messages (mainly useful for error and warning messages). The original macros from tsp_simple_trace.h are replaced by a couple of equivalent macros and functions. The new macros are variadic ones that allow you to use the variable argument lists more naturally. This removes the need for the double parentheses. The majority of the patch is therefore dedicated to removing all the redundant double parentheses. 
+* Robert De Vries 2008-02-05 | Fix typo in doxygen directive. 
+* Frederik Deweerdt 2008-01-25 | Fix two X_session_list_mutex leakeages in error cases. 
+* Eric Noulard 2007-12-08 | Add  "+" to optstring of getopt in order to avoid argument reordering for finding option. Using this getopt will stop analyzing the line as soon as it finds an argument which is not an option. 
+* Robert De Vries 2007-12-04 | Remove empty files. 
+* Robert De Vries 2007-12-02 | Remove embedded ^S character. 
+* Eric Noulard 2007-11-30 | Correct bug #20931 : Use _WIN32 instead of WIN32 Change ifdef WIN32 to _WIN32 
+* Eric Noulard 2007-11-30 | Remove warning for invalid cast from int32 to pointer Second try. I think this one is the good one. This should be OK on all platforms including Win32. 
+* Eric Noulard 2007-11-30 | Remove warning for invalid cast from int32 to pointer moreover this should be totally wrong on 64 bits arch. 
+* Stephane Venerque 2007-11-21 | Temporarily commit operation. No news. 
+* Robert De Vries 2007-11-21 | Fix compiler warnings. 
+* Robert De Vries 2007-11-18 | Fix bad paths in tsp pkgconfig script when building rpm package. 
+* Stephane Venerque 2007-11-17 | Use of BAD_CAST macro since xmlStrcat function can not be used. 
+* Stephane Venerque 2007-11-17 | Modification after having put Gtk-Extra widgets into the TSP external directory. 
+* Stephane Venerque 2007-11-17 | Modification due to the adding of GtkExtra widgets in the "gtk" directory. 
+* Stephane Venerque 2007-11-17 | Adding GTK-Extra widgets in order to be used by TARGA. 
+* Eric Noulard 2007-11-17 | Avoid compilation error 
+* Frederik Deweerdt 2007-11-15 | Fix a typo in bb_utils_parseone_array, &= instead of = 
+* Stephane Venerque 2007-11-14 | Commit for security reasons, but developments are not over. 
+* Robert De Vries 2007-11-12 | - Install xml configuration files in shared files instead of bin - Move include files into separate package tsp-devel - Rename tsp-apidoc package to tsp-doc - Do not install profile shell scripts in /etc/profile.d - Do not set x bits for config files 
+* Frederik Deweerdt 2007-11-12 | Add needed defs for the linux/arm platform 
+* Frederik Deweerdt 2007-11-09 | Fix misc warnings. 
+* Robert De Vries 2007-11-09 | Fix compilation warnings. 
+* Eric Noulard 2007-11-08 | SET_SOURCE_FILES_PROPERTIES seems to be available from CMake 2.2.x no need to check for CMake version 
+* Eric Noulard 2007-11-08 | Update ONCRPC in order to inhibit spurious warnings for generated files. 
+* Robert De Vries 2007-11-07 | Fix spelling error in comment. 
+* Robert De Vries 2007-11-06 | Further cleanups to move the specific variable RPM_MAKE_APIDOC from FindDoxygen.cmake to the top level CMakeLists.txt file. Remove variables from the cache: DOXYGEN_PACKAGE, DOXYGEN_DOT_PACKAGE and RPM_MAKE_APIDOC. Rename variable MAKE_APIDOC to RPM_MAKE_APIDOC to avoid confusion with the MAKE_APIDOC parameter and to make it more clear that it is to be used by the RPM spec file. bug #20919: RPM build fails if doxygen is not found 
+* Eric Noulard 2007-11-06 | Fix bug #21520 : bb_lock call bb_unlock of bb_operation structure 
+* Robert De Vries 2007-11-05 | Remove erroneous paste. 
+* Robert De Vries 2007-11-05 | Include FindDoxygen in top level CMakeLists.txt file to ensure that the variables are propagated to the RPMTools_ADD_RPM_TARGETS macro. Clean up logic of finding packages Remove unused variable Add extra variable that indicates that the apidoc package can be made. Add %if statements to spec file to conditionally create apidoc package if both doxygen and dot are found. bug #20919 RPM build fails if doxygen is not found 
+* Robert De Vries 2007-11-05 | Change message to reflect the actual tool that is to be found. 
+* Eric Noulard 2007-11-03 | Add xxxx_PACKAGE to the CACHE in order to make it available when generating tsp.spec file. 
+* Eric Noulard 2007-11-02 | Small typo fix 
+* Eric Noulard 2007-11-02 | Toward a CMake standard compliant FindTSP.cmake 
+* Eric Noulard 2007-11-02 | Partial merge of first RTEMS patch. https://savannah.nongnu.org/task/?7409 
+* Frederik Deweerdt 2007-09-04 | Move xml related code (process_node and bb_xml_load_file) to bb_xml.{c,h} This code is compiled only if libxml2 is found 
+* Eric Noulard 2007-08-30 | Less warning [again] 
+* Eric Noulard 2007-08-30 | Less Warning respect function prototype for rpc request handler 'run' function Update this -> cthis as it was already done in  header for clean C++ compile. 
+* Eric Noulard 2007-08-30 | Do not put generated files in CVS. [Unless it is really properly handled like for rpcgen generated files] 
+* Eric Noulard 2007-08-30 | Fix build breakage. Trouble was due to CMake 2.6 usage which not available in CMake 2.4.x 
+* Eric Noulard 2007-08-30 | Less compiler warning 
+* Eric Noulard 2007-08-30 | Calm down (gcc) compiler warning for Lex/Yacc generated files 
+* Eric Noulard 2007-08-30 | Calm down (gcc) compiler warning for RPC generated files 
+* Eric Noulard 2007-08-29 | Use new style INSTALL CMake MACRO Try to use COMPONENT (waiting for information on HOW to use it efficiently) 
+* Eric Noulard 2007-08-29 | Small modification for 64 bits machine. Tested on Linux i386 and x86_64 uintptr_t availability should be check on other archs/OS. 
+* Frederik Deweerdt 2007-08-28 | Fix XDR related memory leaks 
+* Frederik Deweerdt 2007-08-27 | Set FUSE_DEVEL_PACKAGE to void if FUSE is not found this allows to build an RPM without FUSE if FUSE was not found on the system. 
+* Frederik Deweerdt 2007-08-27 | 0.8.4cvs: change RPM's release number to 1 
+* Frederik Deweerdt 2007-08-27 | Add reset RPM releases to the release process 
+* Frederik Deweerdt 2007-08-27 | - bb_tools.c:process_node() : Use bb_value_direct_write to avoid code   duplication - bb_tools.c:bbtools_dump() : Remove checksumming dead code 
+* Frederik Deweerdt 2007-08-27 | Value may well contain 0x an still not be an exadecimal, only check for the first two characters. 
+* Frederik Deweerdt 2007-08-27 | Remove unused variable lenval 
+* Frederik Deweerdt 2007-08-27 | Remove superfluous ifndef __KERNEL__ 
+* Frederik Deweerdt 2007-08-27 | Get rid of checksumming inside the BB, see: http://www.mail-archive.com/tsp-devel@nongnu.org/msg00789.html for explanations 
+* Frederik Deweerdt 2007-08-27 | Remove OpenSSL dependecy, we don't use md5sum anymore for dumps 
+* Frederik Deweerdt 2007-08-27 | Remove OpenSSL dependency 
+* Frederik Deweerdt 2007-08-27 | Coding style clean-up Replace MD5 functions with in-house SHA1 implementation 
+* Frederik Deweerdt 2007-08-09 | Add tsp_services lib to pkg-config ldflags. It's absence caused an undefined reference on tsp_usleep 
+* Eric Noulard 2007-07-30 | Switch this trace to debug_more 
+* Eric Noulard 2007-07-30 | Add missing strace include 
+* Eric Noulard 2007-07-30 | Add STRACE_DEBUG for ringbuf allocation Initiate doxygen doc 
+* Eric Noulard 2007-07-24 | Fix some doxygen complains about embedded documentation 
+* Eric Noulard 2007-07-24 | Update TSP doxygen config in order to suppress obsolete FLAGS (as warned by doxygen 1.5.2) 
+* Eric Noulard 2007-07-06 | Add GCC option in order to help usage of Eclipse CDT 
+* Eric Noulard 2007-06-26 | Update rpm spec release in order to ease eventual update 
+* Eric Noulard 2007-06-26 | Use %{prefix}/share/doc/tsp instead of %{prefix}/share/doc 
+* Eric Noulard 2007-06-25 | Second pass for patch 6037 We forgot generated documentation relocation 
+* Eric Noulard 2007-06-25 | Modified patch 6037 applied New Installation Tree for TSP 
+* Frederik Deweerdt 2007-05-15 | Fix bb_data_initialise memset for E_BB_USER. 1.38 fix was only half of the work 
+* Eric Noulard 2007-05-15 | Correct bug #19853 windows CMake run problem 
+* Eric Noulard 2007-05-14 | Add comments for https://savannah.nongnu.org/task/index.php?6883 
+* Eric Noulard 2007-05-12 | Handle dangling RPC connection carefully on first error go UNREACHABLE fpr ever 
+* Eric Noulard 2007-05-12 | Be nice switch t_create failed to DEBUG level this is not really an error someone may try it in order to guess whether if a provider is there 
+* Eric Noulard 2007-05-12 | Add xmlrpc LD_LIBRARY_PATH 
+* Eric Noulard 2007-05-12 | Add Debian packaging support using Mathieu Malaterre UseDebian package (slightly modified) 
+* Eric Noulard 2007-05-04 | Add bb_load script wrapper 
+* Frederik Deweerdt 2007-05-04 | Fix compile error refered to here: http://www.mail-archive.com/tsp-devel@nongnu.org/msg00688.html yytext should be defined in the Definitions section of the lex file, so that the type (pointer or array) is not implementation dependant. 
+* Frederik Deweerdt 2007-05-04 | Modular dumper (classic or xml) New bb_load operation (generate bb from xml file) 
+* Frederik Deweerdt 2007-05-04 | Check for openssl, if found add -DOPENSSL_FOUND to compilation flags 
+* Frederik Deweerdt 2007-05-04 | Fix bug #19719: Check for X11 in addition to OpenGL when building Visu3d 
+
 2007-04-24 15:02  tag TSP_0_8_3
 
 2007-04-24 15:02  deweerdt

@@ -945,7 +945,7 @@ __bb_value_print(struct bb_printer *bp, volatile S_BB_T* bb, S_BB_DATADESC_T dat
 					/*       break;*/
 				case E_BB_USER:
 					for (j=0; j<data_desc.type_size; ++j) {
-						fprintf(priv->fp,"0x%02x",((uint8_t*) data)[i*data_desc.type_size+j]);
+						fprintf(priv->fp,"0x%02x ",((uint8_t*) data)[i*data_desc.type_size+j]);
 						if (((j+1)<data_desc.type_size) && separator != ' ') {
 							fprintf(priv->fp, "%c", separator);
 						}

@@ -1,5 +1,7 @@
-Olivier Bonhomme 2014-06-08 - tag TSP_0_8_4
+Olivier Bonhomme 2014-06-13 - tag TSP_0_8_4
 
+* Olivier Bonhomme 2014-06-13 | Exclude .git directory when generating source archive. (HEAD, master)
+* David Moreau 2014-06-09 | Fixes sr #108598 - E_BB_USER type displayed in hexa with space separators
 * David Moreau 2014-06-07 | Fixes sr #108525: gcc warning on RINGBUF_DEFINE (HEAD, br_TSP_0_8_4_x) 
 * Olivier BONHOMME 2014-04-20 | Update RPM changelog. (origin/br_TSP_0_8_4_x) 
 * Olivier BONHOMME 2014-04-20 | Remove the default initialization for the PACKAGE_VERSION_PATCH variable. 

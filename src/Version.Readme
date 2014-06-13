@@ -261,4 +261,5 @@ V-0.8.3: Creation 04/22/2007    tag TSP_0_8_3
 V-0.8.4: Creation 06/06/2014 tag TSP_0_8_4
 	- v0.8.4 officialized. Inclusion of all changes of the last 7 years
 	- Bug Corrections
+	   * bug #108598 : libbb: bb_read of E_BB_USER type
 	   * bug #108525 : gcc warning on RINGBUF_DEFINE
